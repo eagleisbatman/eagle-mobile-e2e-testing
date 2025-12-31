@@ -8,7 +8,46 @@ Production-grade E2E testing skill for mobile apps using **Detox**. Supports Rea
 
 ---
 
-**Contents:** [Critical Rules](#critical-rules) | [testID Conventions](#testid-conventions) | [Test Naming](#test-naming) | [Build & Test](#build--test-commands) | [Test Patterns](#common-test-patterns) | [Quick Reference](#quick-reference) | [Setup](#setup-requirements)
+**Contents:** [Prompt Template](#prompt-template) | [Critical Rules](#critical-rules) | [testID Conventions](#testid-conventions) | [Build & Test](#build--test-commands) | [Test Patterns](#common-test-patterns) | [Setup](#setup-requirements)
+
+---
+
+## Prompt Template
+
+**Users should provide this context when requesting E2E tests:**
+
+```
+Write E2E tests for [FEATURE] in my mobile app.
+
+**Stack:** [React Native Expo / CLI / SwiftUI / Compose]
+**Screens folder:** [src/screens/ or src/features/*/]
+**Navigation:** [React Navigation / Expo Router / Native]
+**Screen file:** [src/screens/LoginScreen.tsx]
+
+**Flow to test:**
+1. User [action] → sees [result]
+2. User [action] → sees [result]
+
+**Known testIDs:** [list or "discover them"]
+**Special:** [biometrics / deep links / offline / none]
+```
+
+**Quick Examples:**
+
+```
+# Setup
+"Set up Detox for my React Native Expo app. Screens are in src/features/*/screens/"
+
+# Feature Test
+"Write tests for login flow in src/features/auth/screens/LoginScreen.tsx.
+Test: valid login, invalid email error, forgot password navigation."
+
+# Full Suite
+"Create E2E test suite for my e-commerce app. Cover: auth, product browse, cart, checkout.
+Screens in src/screens/, using React Navigation v6 with bottom tabs."
+```
+
+See SKILL.md for detailed templates with all context options.
 
 ---
 

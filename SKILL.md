@@ -38,6 +38,179 @@ A comprehensive, production-ready framework for end-to-end mobile testing using 
 
 ---
 
+## Prompt Templates for AI Assistants
+
+Use these templates when prompting your AI assistant (Claude Code, Cursor, Codex, Copilot, etc.) to write E2E tests. **The more context you provide, the better the tests.**
+
+### Template 1: Initial Setup (First Time)
+
+```
+I need to set up Detox E2E testing for my mobile app. Here's my project context:
+
+**Technology Stack:**
+- Framework: [React Native Expo / React Native CLI / SwiftUI / UIKit / Jetpack Compose / XML]
+- Language: [TypeScript / JavaScript / Swift / Kotlin]
+- State Management: [Redux / MobX / Zustand / Context / None]
+- Navigation: [React Navigation / Expo Router / Native / Other]
+
+**Project Structure:**
+- Root directory: [/path/to/project]
+- Source code location: [src/ / app/ / lib/]
+- Screens/Pages folder: [src/screens/ / src/features/ / app/(tabs)/]
+- Components folder: [src/components/]
+- Navigation config: [src/navigation/ / app/_layout.tsx]
+
+**Current State:**
+- Detox already installed: [Yes / No]
+- Existing testIDs: [Yes, some / No, need to add]
+- CI/CD platform: [GitHub Actions / CircleCI / Bitrise / None yet]
+
+Please:
+1. Discover my existing UI structure (screens, testIDs)
+2. Set up Detox configuration
+3. Create the e2e folder structure
+4. Write initial test for [specific screen/flow]
+```
+
+### Template 2: Write Tests for Specific Feature
+
+```
+Write E2E tests for [FEATURE NAME] in my mobile app.
+
+**App Context:**
+- Framework: [React Native Expo / etc.]
+- Screen location: [src/screens/LoginScreen.tsx / etc.]
+- Navigation: The screen is accessed via [tab / stack / drawer] from [HomeScreen / etc.]
+
+**Feature Details:**
+- Screen name: [LoginScreen / CheckoutScreen / etc.]
+- Main user flows to test:
+  1. [User enters email and password, taps login, sees home screen]
+  2. [User enters invalid email, sees validation error]
+  3. [User taps forgot password, navigates to reset screen]
+
+**Existing testIDs (if known):**
+- [login-email-input]
+- [login-password-input]
+- [login-submit-button]
+- [Or say "Please discover testIDs first"]
+
+**Special Requirements:**
+- [ ] Test with biometric authentication
+- [ ] Test offline behavior
+- [ ] Test deep link: [myapp://login?token=xyz]
+- [ ] Mock API responses
+- [ ] Record video of test run
+
+Please follow best practices: discover UI first, use background execution, generate HTML report.
+```
+
+### Template 3: Full Test Suite Generation
+
+```
+Create a comprehensive E2E test suite for my [APP TYPE] mobile app.
+
+**App Overview:**
+- App name: [MyApp]
+- Framework: [React Native Expo]
+- Purpose: [E-commerce / Social Media / Banking / Productivity / etc.]
+
+**Project Paths:**
+- Root: [/Users/me/projects/myapp]
+- Screens: [src/features/*/screens/ or src/screens/]
+- Components: [src/components/]
+- Navigation: [src/navigation/AppNavigator.tsx]
+- API services: [src/services/ or src/api/]
+
+**Key User Flows to Cover:**
+1. Authentication: [Login, Register, Forgot Password, Logout]
+2. Main Feature: [Browse products, Add to cart, Checkout]
+3. Profile: [View profile, Edit settings, Change password]
+4. [Add more flows specific to your app]
+
+**Test Configuration:**
+- Target devices: [iOS Simulator / Android Emulator / Both]
+- iOS device: [iPhone 15 / iPhone 14 Pro / etc.]
+- Android device: [Pixel 4 API 33 / etc.]
+
+**Output Requirements:**
+- Generate HTML report after tests
+- Record videos for failed tests
+- Take screenshots at key steps
+- Organize tests by feature in e2e/flows/
+
+Please:
+1. First discover all screens and existing testIDs
+2. Identify missing testIDs and suggest additions
+3. Create test files organized by feature
+4. Set up CI workflow for [GitHub Actions / CircleCI]
+```
+
+### Template 4: Quick Single Test
+
+```
+Write a quick E2E test for [SPECIFIC ACTION].
+
+Context:
+- File: [src/screens/ProductScreen.tsx]
+- Action: [User taps "Add to Cart" button, sees success toast]
+- testID: [product-add-cart-button] (or discover it)
+
+Just write the test, run it, and show me the result.
+```
+
+### Template 5: Debug Failing Test
+
+```
+My E2E test is failing. Help me debug it.
+
+**Error Message:**
+[Paste the error message here]
+
+**Test File:**
+[e2e/flows/auth/login-flow.test.ts]
+
+**What Should Happen:**
+[User taps login button, navigates to home screen]
+
+**What Actually Happens:**
+[Test times out waiting for home-screen element]
+
+**Recent Changes:**
+[Changed navigation structure / Updated component / etc.]
+
+Please:
+1. Analyze the error
+2. Check if testIDs still exist in the codebase
+3. Suggest fixes
+4. Run the test again after fixing
+```
+
+### Key Context to Always Include
+
+| Context | Why It Matters | Example |
+|---------|----------------|---------|
+| **Framework** | Determines testID method | `React Native Expo` |
+| **Screen folder path** | Agent knows where to look | `src/features/auth/screens/` |
+| **Navigation type** | Affects how to navigate in tests | `Expo Router with tabs` |
+| **Existing testIDs** | Prevents duplicate work | `login-email-input, login-button` |
+| **Target flow** | Focuses the test scope | `User login with email/password` |
+| **Special features** | Enables advanced testing | `Biometrics, deep links, offline` |
+
+### Pro Tips
+
+1. **Be Specific About Paths**: Instead of "my login screen", say `src/features/auth/screens/LoginScreen.tsx`
+
+2. **Mention Your Navigation**: "Using React Navigation v6 with a bottom tab navigator containing Home, Search, Profile tabs"
+
+3. **List Known testIDs**: If you already have some, share them so the agent doesn't search unnecessarily
+
+4. **Describe the User Flow**: "User opens app → sees welcome screen → taps 'Sign In' → enters email/password → taps 'Login' → sees home feed"
+
+5. **Specify Device Targets**: "Test on iPhone 15 simulator and Pixel 4 API 33 emulator"
+
+---
+
 ## CRITICAL: Codebase Discovery Before Writing Tests
 
 **IMPORTANT:** Before writing ANY test cases, you MUST systematically discover the UI structure. Do NOT flood the terminal with large file dumps.

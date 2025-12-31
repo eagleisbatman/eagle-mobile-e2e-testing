@@ -132,13 +132,56 @@ curl -o AGENTS.md https://raw.githubusercontent.com/eagleisbatman/eagle-mobile-e
 
 ## Start Testing
 
-Once installed, ask your AI assistant:
+Once installed, use these prompt templates to get the best results from your AI assistant.
 
-> *"Help me set up Detox E2E testing for my React Native Expo app"*
+### Quick Start Prompts
 
-> *"Write E2E tests for my checkout flow"*
+> *"Help me set up Detox E2E testing for my React Native Expo app. My screens are in src/features/*/screens/"*
 
-> *"Test biometric authentication in my iOS app"*
+> *"Write E2E tests for my login flow in src/screens/LoginScreen.tsx"*
+
+> *"Test biometric authentication in my iOS SwiftUI app"*
+
+### Recommended Prompt Template
+
+For best results, provide context about your project:
+
+```
+Write E2E tests for [FEATURE] in my mobile app.
+
+**Stack:** [React Native Expo / CLI / SwiftUI / Jetpack Compose]
+**Screens folder:** [src/screens/ or src/features/*/screens/]
+**Navigation:** [React Navigation / Expo Router / Native]
+**Screen file:** [path/to/Screen.tsx]
+
+**Flow to test:**
+1. User [action] → sees [result]
+2. User [action] → sees [result]
+
+**Known testIDs:** [list them or "please discover"]
+**Special requirements:** [biometrics / deep links / offline / none]
+```
+
+### Example Prompt
+
+```
+Write E2E tests for user authentication in my React Native Expo app.
+
+**Stack:** React Native Expo with TypeScript
+**Screens folder:** src/features/auth/screens/
+**Navigation:** Expo Router with tabs
+**Screen file:** src/features/auth/screens/LoginScreen.tsx
+
+**Flow to test:**
+1. User enters valid email/password → taps Login → sees Home screen
+2. User enters invalid email → sees validation error
+3. User taps "Forgot Password" → navigates to reset screen
+
+**Known testIDs:** login-email-input, login-password-input, login-submit-button
+**Special requirements:** none
+```
+
+See [SKILL.md](SKILL.md) for 5 detailed prompt templates covering setup, feature testing, full suites, quick tests, and debugging.
 
 ---
 
