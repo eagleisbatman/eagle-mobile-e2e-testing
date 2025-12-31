@@ -39,6 +39,21 @@
 
 ---
 
+## Important: How Claude Uses This Skill
+
+When writing E2E tests, Claude follows these critical guidelines (defined in SKILL.md):
+
+| Guideline | Why It Matters |
+|-----------|----------------|
+| **UI Discovery First** | Before writing tests, Claude searches for existing testIDs and screens using targeted grep — never dumps entire files |
+| **Background Execution** | All builds (`detox build`) and test runs (`detox test`) execute in background to prevent terminal flooding |
+| **Selective Reading** | Claude reads only relevant code sections (first 60 lines, specific patterns) — not entire components |
+| **Output Limiting** | All search results are limited with `head -N` to prevent terminal crashes |
+
+These practices ensure smooth, efficient test development without overwhelming your terminal.
+
+---
+
 ## Quick Start
 
 ### Step 1 — Install the Skill
@@ -292,7 +307,7 @@ The skill includes comprehensive example tests for various app types:
 
 ```
 eagle-mobile-e2e-testing/
-├── SKILL.md                      # Main skill definition (1600+ lines)
+├── SKILL.md                      # Main skill definition (1800+ lines)
 ├── README.md                     # This file
 ├── LICENSE                       # MIT License
 ├── references/
@@ -303,14 +318,14 @@ eagle-mobile-e2e-testing/
 ├── scripts/
 │   ├── run-e2e.sh                # Automated test runner
 │   └── generate-report.js        # HTML report generator with Lucide icons
-├── examples/
-│   ├── auth/                     # Authentication examples
-│   ├── commerce/                 # E-commerce examples
-│   ├── social/                   # Social media examples
-│   ├── messaging/                # Chat/messaging examples
-│   ├── media/                    # Media playback examples
-│   ├── productivity/             # Productivity app examples
-│   └── ...                       # Additional categories
+├── examples/                     # 28 comprehensive test examples
+│   ├── login-flow.test.ts        # Authentication patterns
+│   ├── registration-flow.test.ts # User registration
+│   ├── e-commerce.test.ts        # Shopping cart, checkout
+│   ├── social-media.test.ts      # Feed, posts, stories
+│   ├── video-player.test.ts      # Media playback
+│   ├── accessibility.test.ts     # A11y testing patterns
+│   └── ...                       # 22 more examples
 └── .github/
     └── workflows/
         └── e2e-tests.yml         # GitHub Actions workflow
