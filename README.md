@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🦅 Eagle Mobile E2E Testing
+# Eagle Mobile E2E Testing
 
 ### *The Ultimate Claude Code Skill for Mobile Testing Excellence*
 
@@ -12,47 +12,47 @@
 
 **Production-grade E2E testing for mobile apps with AI-powered test generation**
 
-*React Native (Expo/CLI) • SwiftUI • UIKit • Jetpack Compose • XML Views*
+*React Native (Expo/CLI) · SwiftUI · UIKit · Jetpack Compose · XML Views*
 
 <br />
 
-[Getting Started](#-quick-start) •
-[Features](#-features) •
-[Examples](#-examples) •
-[Documentation](#-documentation) •
+[Getting Started](#-quick-start) ·
+[Features](#-features) ·
+[Examples](#-examples) ·
+[Documentation](#-documentation) ·
 [Advanced Testing](#-advanced-capabilities)
 
 ---
 
 </div>
 
-## ✨ What Makes Eagle Special?
+## What Makes Eagle Special?
 
 | | Feature | Description |
 |:---:|---------|-------------|
-| 🎯 | **Universal Platform Support** | Single skill for React Native, iOS native, and Android native apps |
-| 🤖 | **AI-Powered Testing** | Generate tests from natural language using Wix Pilot |
-| 🎬 | **Rich Artifacts** | Video recordings, screenshots, logs, and timeline traces for every test |
-| 📊 | **Beautiful Reports** | Modern HTML reports with dark/light mode and video playback |
-| 🔐 | **Advanced Scenarios** | Biometrics, deep links, permissions, offline mode, network mocking |
-| 🔄 | **CI/CD Ready** | Pre-configured workflows for GitHub Actions, CircleCI, and Bitrise |
+| ◉ | **Universal Platform Support** | Single skill for React Native, iOS native, and Android native apps |
+| ◉ | **AI-Powered Testing** | Generate tests from natural language using Wix Pilot |
+| ◉ | **Rich Artifacts** | Video recordings, screenshots, logs, and timeline traces for every test |
+| ◉ | **Beautiful Reports** | Modern HTML reports with dark/light mode and video playback |
+| ◉ | **Advanced Scenarios** | Biometrics, deep links, permissions, offline mode, network mocking |
+| ◉ | **CI/CD Ready** | Pre-configured workflows for GitHub Actions, CircleCI, and Bitrise |
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1️⃣ Install the Skill
+### Step 1 — Install the Skill
 
 ```bash
 # Clone to your Claude Code skills directory
 git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/eagle-mobile-e2e-testing
 ```
 
-### 2️⃣ Restart Claude Code
+### Step 2 — Restart Claude Code
 
 The skill loads automatically and becomes available in your conversations.
 
-### 3️⃣ Start Testing!
+### Step 3 — Start Testing
 
 Just ask Claude:
 
@@ -64,22 +64,22 @@ Just ask Claude:
 
 ---
 
-## 🎯 Platform Support Matrix
+## Platform Support Matrix
 
 | Platform | Framework | Support | testID Method |
 |:--------:|:---------:|:-------:|---------------|
-| 📱 React Native | Expo | ✅ Full | `testID="id"` |
-| 📱 React Native | CLI | ✅ Full | `testID="id"` |
-| 🍎 iOS | SwiftUI | ✅ Full | `.accessibilityIdentifier("id")` |
-| 🍎 iOS | UIKit | ✅ Full | `accessibilityIdentifier = "id"` |
-| 🤖 Android | Compose | ✅ Full | `Modifier.testTag("id")` |
-| 🤖 Android | XML | ✅ Full | `android:contentDescription="id"` |
+| React Native | Expo | Full | `testID="id"` |
+| React Native | CLI | Full | `testID="id"` |
+| iOS | SwiftUI | Full | `.accessibilityIdentifier("id")` |
+| iOS | UIKit | Full | `accessibilityIdentifier = "id"` |
+| Android | Compose | Full | `Modifier.testTag("id")` |
+| Android | XML | Full | `android:contentDescription="id"` |
 
 ---
 
-## 🏆 Features
+## Features
 
-### 📝 Enforced Best Practices
+### Enforced Best Practices
 
 Tests that are readable, maintainable, and produce meaningful reports:
 
@@ -94,7 +94,7 @@ describe('User Authentication - Login Flow', () => {
 });
 ```
 
-### 🏷️ Standardized testID Patterns
+### Standardized testID Patterns
 
 ```typescript
 // Pattern: {screen}-{element}-{type}
@@ -105,16 +105,17 @@ testID="login-error-banner"        // Error display
 testID="product-row-0"             // Indexed list items
 ```
 
-### 📊 Stunning HTML Reports
+### Professional HTML Reports
 
 The included report generator creates beautiful, interactive reports with:
 
-- 🌓 **Dark/Light mode toggle** with system preference detection
-- 📺 **Two-column layout** - Video playback alongside test details
-- 🖼️ **Screenshot gallery** with lightbox viewer
-- ⏱️ **Timeline visualization** of test steps
-- 🔍 **Filtering** by passed/failed status
-- ⌨️ **Keyboard navigation** (↑↓ arrows, j/k keys)
+- **Dark/Light mode toggle** — with system preference detection
+- **Two-column layout** — Video playback alongside test details
+- **Screenshot gallery** — with lightbox viewer
+- **Timeline visualization** — of test steps
+- **Filtering** — by passed/failed status
+- **Keyboard navigation** — arrow keys and j/k support
+- **Professional icons** — using Lucide icon library (open source)
 
 ```bash
 # Generate a report
@@ -123,10 +124,10 @@ node scripts/generate-report.js --artifacts ./artifacts --output ./reports --pro
 
 ---
 
-## 🛠️ Advanced Capabilities
+## Advanced Capabilities
 
 <details>
-<summary><b>🔐 Device Permissions</b></summary>
+<summary><b>Device Permissions</b></summary>
 
 ```typescript
 // iOS - Full permission control
@@ -150,7 +151,7 @@ await device.launchApp({
 </details>
 
 <details>
-<summary><b>👆 Biometric Authentication</b></summary>
+<summary><b>Biometric Authentication</b></summary>
 
 ```typescript
 // Enable biometrics
@@ -168,7 +169,7 @@ await device.unmatchFace();
 </details>
 
 <details>
-<summary><b>🔗 Deep Linking</b></summary>
+<summary><b>Deep Linking</b></summary>
 
 ```typescript
 // Launch with deep link
@@ -184,7 +185,7 @@ await device.openURL({
 </details>
 
 <details>
-<summary><b>📲 Push Notifications</b></summary>
+<summary><b>Push Notifications</b></summary>
 
 ```typescript
 await device.sendUserNotification({
@@ -200,7 +201,7 @@ await device.sendUserNotification({
 </details>
 
 <details>
-<summary><b>🌐 Network Mocking & Offline Mode</b></summary>
+<summary><b>Network Mocking and Offline Mode</b></summary>
 
 ```typescript
 // Block analytics/tracking URLs
@@ -220,7 +221,7 @@ await device.setURLBlacklist([]);
 </details>
 
 <details>
-<summary><b>📍 Location Mocking</b></summary>
+<summary><b>Location Mocking</b></summary>
 
 ```typescript
 // San Francisco
@@ -237,7 +238,7 @@ await device.setLocation(37.7751, -122.4180);
 </details>
 
 <details>
-<summary><b>🔄 Background/Foreground</b></summary>
+<summary><b>Background/Foreground States</b></summary>
 
 ```typescript
 // Send app to background
@@ -256,66 +257,68 @@ await expect(element(by.id('home-screen'))).toBeVisible();
 
 ---
 
-## 📁 Examples Library
+## Examples Library
 
 The skill includes comprehensive example tests for various app types:
 
-| Example | Description | Key Patterns |
-|---------|-------------|--------------|
-| **E-Commerce** | Shopping cart, checkout, payments | Product browsing, cart management, order flow |
-| **Social Media** | Feeds, posts, stories, profiles | Infinite scroll, media upload, interactions |
-| **Messaging** | Chat, group chats, media sharing | Real-time updates, voice messages, video calls |
-| **Onboarding** | Welcome flows, tutorials, permissions | Carousels, progress indicators, skip functionality |
-| **Gaming** | Menus, purchases, leaderboards | In-app purchases, achievements, multiplayer |
-| **Login/Auth** | Email, social login, biometrics | Form validation, error handling, session management |
-| **Permissions** | Camera, location, notifications | Permission requests, fallback flows |
+| Category | Examples | Key Patterns |
+|----------|----------|--------------|
+| **Authentication** | Login, Registration, Password Reset, Social Login, Biometrics, 2FA | Form validation, error handling, session management |
+| **E-Commerce** | Product Browsing, Cart, Checkout, Payments, Orders, Wishlist | Product catalog, cart operations, payment flows |
+| **Social Media** | Feeds, Posts, Stories, Profiles, Following, DMs | Infinite scroll, media upload, interactions |
+| **Messaging** | Chat, Group Chats, Media Sharing, Voice/Video Calls | Real-time updates, media handling, call states |
+| **Onboarding** | Welcome Flows, Tutorials, Permissions, Personalization | Carousels, progress indicators, skip logic |
+| **Gaming** | Menus, In-App Purchases, Leaderboards, Achievements | IAP flows, score tracking, multiplayer |
+| **Media** | Video Player, Audio Player, Streaming, Downloads | Playback controls, quality selection, offline |
+| **Productivity** | Forms, File Management, Calendar, Notes | Data entry, file operations, scheduling |
+| **Navigation** | Tab Navigation, Drawer, Stack, Deep Links | Navigation patterns, state preservation |
+| **Settings** | Preferences, Account, Privacy, Notifications | Toggle states, data management |
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 | Document | Description |
 |----------|-------------|
-| [📘 SKILL.md](SKILL.md) | Complete skill reference with all advanced capabilities |
-| [⚙️ detox-config.md](references/detox-config.md) | Detox configuration deep-dive |
-| [🤖 android-setup.md](references/android-setup.md) | Android native code patches |
-| [🧠 pilot-setup.md](references/pilot-setup.md) | AI-powered test generation setup |
-| [🔄 ci-workflows.md](references/ci-workflows.md) | CI/CD workflow configurations |
+| [SKILL.md](SKILL.md) | Complete skill reference with all advanced capabilities |
+| [detox-config.md](references/detox-config.md) | Detox configuration deep-dive |
+| [android-setup.md](references/android-setup.md) | Android native code patches |
+| [pilot-setup.md](references/pilot-setup.md) | AI-powered test generation setup |
+| [ci-workflows.md](references/ci-workflows.md) | CI/CD workflow configurations |
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 eagle-mobile-e2e-testing/
-├── 📘 SKILL.md                      # Main skill definition (1600+ lines!)
-├── 📖 README.md                     # You are here
-├── 📄 LICENSE                       # MIT License
-├── 📁 references/
-│   ├── detox-config.md              # Complete .detoxrc.js guide
-│   ├── android-setup.md             # Android native patches
-│   ├── pilot-setup.md               # Wix Pilot AI testing
-│   └── ci-workflows.md              # CI/CD configurations
-├── 📁 scripts/
-│   ├── run-e2e.sh                   # Automated test runner
-│   └── generate-report.js           # Beautiful HTML report generator
-├── 📁 examples/
-│   ├── login-flow.test.ts           # Authentication tests
-│   ├── permissions.test.ts          # Permission testing
-│   ├── advanced-features.test.ts    # Deep links, biometrics
-│   ├── e-commerce.test.ts           # Shopping app patterns
-│   ├── social-media.test.ts         # Social networking patterns
-│   ├── messaging-chat.test.ts       # Chat app patterns
-│   ├── onboarding-tutorial.test.ts  # Onboarding flows
-│   └── gaming-entertainment.test.ts # Gaming & media patterns
-└── 📁 .github/
+├── SKILL.md                      # Main skill definition (1600+ lines)
+├── README.md                     # This file
+├── LICENSE                       # MIT License
+├── references/
+│   ├── detox-config.md           # Complete .detoxrc.js guide
+│   ├── android-setup.md          # Android native patches
+│   ├── pilot-setup.md            # Wix Pilot AI testing
+│   └── ci-workflows.md           # CI/CD configurations
+├── scripts/
+│   ├── run-e2e.sh                # Automated test runner
+│   └── generate-report.js        # HTML report generator with Lucide icons
+├── examples/
+│   ├── auth/                     # Authentication examples
+│   ├── commerce/                 # E-commerce examples
+│   ├── social/                   # Social media examples
+│   ├── messaging/                # Chat/messaging examples
+│   ├── media/                    # Media playback examples
+│   ├── productivity/             # Productivity app examples
+│   └── ...                       # Additional categories
+└── .github/
     └── workflows/
-        └── e2e-tests.yml            # GitHub Actions workflow
+        └── e2e-tests.yml         # GitHub Actions workflow
 ```
 
 ---
 
-## 💻 System Requirements
+## System Requirements
 
 ### macOS (for iOS testing)
 - Xcode 14+ with Command Line Tools
@@ -329,14 +332,14 @@ eagle-mobile-e2e-testing/
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Whether it's:
 
-- 🐛 Bug reports
-- 💡 Feature suggestions
-- 📝 Documentation improvements
-- 🔧 Code contributions
+- Bug reports
+- Feature suggestions
+- Documentation improvements
+- Code contributions
 
 Please feel free to open an issue or submit a PR.
 
@@ -353,31 +356,32 @@ git push origin feature/amazing-feature
 
 ---
 
-## 📚 Resources
+## Resources
 
 | Resource | Link |
 |----------|------|
 | Detox Documentation | [wix.github.io/Detox](https://wix.github.io/Detox/) |
 | Wix Pilot (AI Testing) | [github.com/wix-incubator/pilot](https://github.com/wix-incubator/pilot) |
 | Detox GitHub | [github.com/wix/Detox](https://github.com/wix/Detox) |
+| Lucide Icons | [lucide.dev](https://lucide.dev/) |
 | Firebase DebugView | [firebase.google.com/docs/analytics/debugview](https://firebase.google.com/docs/analytics/debugview) |
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
 
-### Made with ❤️ by [Gautam Mandewalker](https://www.linkedin.com/in/gautammandewalker)
+### Made with care by [Gautam Mandewalker](https://www.linkedin.com/in/gautammandewalker)
 
 *For the mobile testing community*
 
 <br />
 
-**[⬆ Back to Top](#-eagle-mobile-e2e-testing)**
+**[Back to Top](#eagle-mobile-e2e-testing)**
 
 </div>

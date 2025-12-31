@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 /**
- * Eagle Mobile E2E Testing - Modern HTML Report Generator
+ * Eagle Mobile E2E Testing - Professional HTML Report Generator
  *
  * Generates beautiful, interactive test reports with:
  * - Dark/Light mode toggle with system preference detection
  * - Two-column layout (video + test details)
  * - Modern glassmorphism design
+ * - Professional Lucide icons (open-source, MIT license)
  * - Interactive test navigation
  * - Video playback with controls
  * - Screenshot lightbox gallery
- * - Animated statistics
+ *
+ * Icons: This report uses Lucide icons (https://lucide.dev)
+ * Lucide is an open-source icon library with MIT license.
  *
  * Usage: node generate-report.js [options]
  *   --artifacts <dir>   Artifacts directory (default: ./artifacts)
@@ -52,6 +55,10 @@ Options:
   --name <name>       Report file name (default: e2e-test-report)
   --project <name>    Project name for header
   --help              Show this help message
+
+Icons:
+  This report uses Lucide icons (https://lucide.dev)
+  Lucide is an open-source icon library licensed under MIT.
 `);
     process.exit(0);
   }
@@ -90,12 +97,10 @@ function scanArtifacts(artifactsDir) {
     return tests;
   }
 
-  // Find all videos and group by test
   const videos = findFiles(artifactsDir, ['.mp4', '.mov', '.webm']);
   const screenshots = findFiles(artifactsDir, ['.png', '.jpg', '.jpeg']);
   const logs = findFiles(artifactsDir, ['.log', '.txt']);
 
-  // Group files by parent directory (test name)
   const testMap = new Map();
 
   const processFile = (filePath, type) => {
@@ -129,7 +134,6 @@ function scanArtifacts(artifactsDir) {
   screenshots.forEach(f => processFile(f, 'screenshot'));
   logs.forEach(f => processFile(f, 'log'));
 
-  // Also check for test-result.json files
   const resultFiles = findFiles(artifactsDir, ['.json']);
   resultFiles.forEach(jsonPath => {
     if (path.basename(jsonPath) === 'test-result.json') {
@@ -171,10 +175,10 @@ function formatTestName(name) {
  */
 function inferStatus(name) {
   const lower = name.toLowerCase();
-  if (lower.includes('pass') || lower.includes('success') || lower.includes('✓')) {
+  if (lower.includes('pass') || lower.includes('success')) {
     return 'passed';
   }
-  if (lower.includes('fail') || lower.includes('error') || lower.includes('✗')) {
+  if (lower.includes('fail') || lower.includes('error')) {
     return 'failed';
   }
   return 'unknown';
@@ -191,29 +195,7 @@ function formatDuration(ms) {
 }
 
 /**
- * Convert file path to data URI for embedding
- */
-function fileToDataUri(filePath) {
-  try {
-    const ext = path.extname(filePath).toLowerCase();
-    const mimeTypes = {
-      '.mp4': 'video/mp4',
-      '.mov': 'video/quicktime',
-      '.webm': 'video/webm',
-      '.png': 'image/png',
-      '.jpg': 'image/jpeg',
-      '.jpeg': 'image/jpeg'
-    };
-    const mime = mimeTypes[ext] || 'application/octet-stream';
-    const data = fs.readFileSync(filePath);
-    return `data:${mime};base64,${data.toString('base64')}`;
-  } catch (e) {
-    return null;
-  }
-}
-
-/**
- * Generate the HTML report
+ * Generate the HTML report with Lucide icons
  */
 function generateHTML(tests, config) {
   const passed = tests.filter(t => t.status === 'passed').length;
@@ -222,7 +204,6 @@ function generateHTML(tests, config) {
   const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
   const timestamp = new Date().toLocaleString();
 
-  // Helper to generate test item HTML
   const generateTestItem = (test, index) => `
     <div class="test-item ${index === 0 ? 'active' : ''}" data-index="${index}" data-status="${test.status}" onclick="selectTest(${index})">
       <div class="test-item-header">
@@ -230,9 +211,9 @@ function generateHTML(tests, config) {
         <div class="test-name">${test.name}</div>
       </div>
       <div class="test-meta">
-        ${test.duration ? `<span>⏱ ${formatDuration(test.duration)}</span>` : ''}
-        ${test.videos.length > 0 ? `<span>🎬 ${test.videos.length}</span>` : ''}
-        ${test.screenshots.length > 0 ? `<span>📷 ${test.screenshots.length}</span>` : ''}
+        ${test.duration ? `<span><i data-lucide="clock" class="icon-sm"></i> ${formatDuration(test.duration)}</span>` : ''}
+        ${test.videos.length > 0 ? `<span><i data-lucide="video" class="icon-sm"></i> ${test.videos.length}</span>` : ''}
+        ${test.screenshots.length > 0 ? `<span><i data-lucide="camera" class="icon-sm"></i> ${test.screenshots.length}</span>` : ''}
       </div>
     </div>
   `;
@@ -246,9 +227,10 @@ function generateHTML(tests, config) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Lucide Icons - Open Source (MIT License) - https://lucide.dev -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     :root {
-      /* Light mode colors */
       --bg-primary: #f8fafc;
       --bg-secondary: #ffffff;
       --bg-tertiary: #f1f5f9;
@@ -292,15 +274,8 @@ function generateHTML(tests, config) {
       --warning-bg: rgba(245, 158, 11, 0.18);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -311,13 +286,15 @@ function generateHTML(tests, config) {
       line-height: 1.6;
     }
 
-    /* Animated background gradient */
+    /* Lucide icon styling */
+    .icon-sm { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
+    .icon-md { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
+    .icon-lg { width: 24px; height: 24px; vertical-align: -5px; margin-right: 8px; }
+    .icon-xl { width: 32px; height: 32px; }
+
     .bg-gradient {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background:
         radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 100%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
@@ -334,7 +311,6 @@ function generateHTML(tests, config) {
       z-index: 1;
     }
 
-    /* Header Section */
     .header {
       background: var(--bg-glass);
       backdrop-filter: blur(20px);
@@ -367,7 +343,7 @@ function generateHTML(tests, config) {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.75rem;
+      color: white;
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
 
@@ -384,9 +360,11 @@ function generateHTML(tests, config) {
     .logo-text p {
       font-size: 0.875rem;
       color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    /* Theme Toggle */
     .theme-toggle {
       position: relative;
       width: 68px;
@@ -397,6 +375,10 @@ function generateHTML(tests, config) {
       transition: background 0.3s ease;
       border: 1px solid var(--border-color);
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
     }
 
     .theme-toggle::before {
@@ -410,6 +392,7 @@ function generateHTML(tests, config) {
       border-radius: 50%;
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: var(--shadow-sm);
+      z-index: 1;
     }
 
     [data-theme="dark"] .theme-toggle::before {
@@ -417,19 +400,16 @@ function generateHTML(tests, config) {
     }
 
     .theme-toggle .icon {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 14px;
+      color: var(--text-muted);
       transition: opacity 0.3s ease;
+      z-index: 0;
     }
 
-    .theme-toggle .sun { left: 10px; opacity: 1; }
-    .theme-toggle .moon { right: 10px; opacity: 0.4; }
-    [data-theme="dark"] .theme-toggle .sun { opacity: 0.4; }
-    [data-theme="dark"] .theme-toggle .moon { opacity: 1; }
+    .theme-toggle .icon-sun { opacity: 1; }
+    .theme-toggle .icon-moon { opacity: 0.4; }
+    [data-theme="dark"] .theme-toggle .icon-sun { opacity: 0.4; }
+    [data-theme="dark"] .theme-toggle .icon-moon { opacity: 1; }
 
-    /* Stats Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -449,9 +429,7 @@ function generateHTML(tests, config) {
     .stat-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 3px;
       background: var(--accent-gradient);
       opacity: 0;
@@ -463,9 +441,7 @@ function generateHTML(tests, config) {
       box-shadow: var(--shadow-md);
     }
 
-    .stat-card:hover::before {
-      opacity: 1;
-    }
+    .stat-card:hover::before { opacity: 1; }
 
     .stat-card .label {
       font-size: 0.7rem;
@@ -474,6 +450,9 @@ function generateHTML(tests, config) {
       color: var(--text-muted);
       margin-bottom: 0.5rem;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .stat-card .value {
@@ -488,7 +467,6 @@ function generateHTML(tests, config) {
     .stat-card.total .value { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .stat-card.rate .value { color: var(--accent-primary); }
 
-    /* Main Content - Two Column Layout */
     .main-content {
       display: grid;
       grid-template-columns: 380px 1fr;
@@ -496,7 +474,6 @@ function generateHTML(tests, config) {
       min-height: calc(100vh - 280px);
     }
 
-    /* Test List Sidebar */
     .test-list-container {
       background: var(--bg-glass);
       backdrop-filter: blur(20px);
@@ -524,6 +501,9 @@ function generateHTML(tests, config) {
       font-size: 1rem;
       font-weight: 600;
       letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .filter-buttons {
@@ -541,6 +521,9 @@ function generateHTML(tests, config) {
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .filter-btn:hover {
@@ -617,7 +600,11 @@ function generateHTML(tests, config) {
       gap: 0.75rem;
     }
 
-    /* Detail Panel */
+    .test-meta span {
+      display: flex;
+      align-items: center;
+    }
+
     .detail-panel {
       background: var(--bg-glass);
       backdrop-filter: blur(20px);
@@ -657,6 +644,9 @@ function generateHTML(tests, config) {
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .badge.passed { background: var(--success-bg); color: var(--success); }
@@ -664,7 +654,6 @@ function generateHTML(tests, config) {
     .badge.unknown { background: var(--warning-bg); color: var(--warning); }
     .badge.duration { background: var(--bg-tertiary); color: var(--text-secondary); text-transform: none; }
 
-    /* Video Player */
     .video-container {
       position: relative;
       background: #000;
@@ -693,7 +682,6 @@ function generateHTML(tests, config) {
     }
 
     .no-video-icon {
-      font-size: 4rem;
       opacity: 0.3;
     }
 
@@ -702,10 +690,7 @@ function generateHTML(tests, config) {
       opacity: 0.6;
     }
 
-    /* Screenshots Gallery */
-    .screenshots-section {
-      margin-bottom: 1.5rem;
-    }
+    .screenshots-section { margin-bottom: 1.5rem; }
 
     .section-title {
       font-size: 0.875rem;
@@ -746,9 +731,7 @@ function generateHTML(tests, config) {
 
     .screenshot-item .screenshot-name {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       background: linear-gradient(transparent, rgba(0,0,0,0.8));
       color: white;
       padding: 2rem 0.5rem 0.5rem;
@@ -758,7 +741,6 @@ function generateHTML(tests, config) {
       text-overflow: ellipsis;
     }
 
-    /* Error Section */
     .error-section {
       background: var(--error-bg);
       border: 1px solid var(--error);
@@ -786,10 +768,7 @@ function generateHTML(tests, config) {
       line-height: 1.5;
     }
 
-    /* Test Steps Timeline */
-    .steps-section {
-      margin-bottom: 1.5rem;
-    }
+    .steps-section { margin-bottom: 1.5rem; }
 
     .steps-timeline {
       position: relative;
@@ -812,9 +791,7 @@ function generateHTML(tests, config) {
       padding-bottom: 1rem;
     }
 
-    .step-item:last-child {
-      padding-bottom: 0;
-    }
+    .step-item:last-child { padding-bottom: 0; }
 
     .step-item::before {
       content: '';
@@ -845,10 +822,7 @@ function generateHTML(tests, config) {
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Logs Section */
-    .logs-section {
-      margin-bottom: 1.5rem;
-    }
+    .logs-section { margin-bottom: 1.5rem; }
 
     .logs-content {
       background: var(--bg-tertiary);
@@ -866,7 +840,6 @@ function generateHTML(tests, config) {
       line-height: 1.6;
     }
 
-    /* Empty State */
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -878,7 +851,6 @@ function generateHTML(tests, config) {
     }
 
     .empty-state-icon {
-      font-size: 4rem;
       margin-bottom: 1rem;
       opacity: 0.4;
     }
@@ -890,17 +862,11 @@ function generateHTML(tests, config) {
       font-weight: 600;
     }
 
-    .empty-state p {
-      font-size: 0.875rem;
-    }
+    .empty-state p { font-size: 0.875rem; }
 
-    /* Lightbox */
     .lightbox {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.92);
       display: none;
       align-items: center;
@@ -910,9 +876,7 @@ function generateHTML(tests, config) {
       backdrop-filter: blur(8px);
     }
 
-    .lightbox.active {
-      display: flex;
-    }
+    .lightbox.active { display: flex; }
 
     .lightbox img {
       max-width: 90%;
@@ -930,7 +894,6 @@ function generateHTML(tests, config) {
       border-radius: 50%;
       background: rgba(255,255,255,0.1);
       color: white;
-      font-size: 1.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -938,11 +901,8 @@ function generateHTML(tests, config) {
       transition: background 0.2s ease;
     }
 
-    .lightbox-close:hover {
-      background: rgba(255,255,255,0.2);
-    }
+    .lightbox-close:hover { background: rgba(255,255,255,0.2); }
 
-    /* Footer */
     .footer {
       text-align: center;
       padding: 2rem;
@@ -962,80 +922,30 @@ function generateHTML(tests, config) {
       text-decoration: underline;
     }
 
-    .footer .heart {
-      color: #ef4444;
-      display: inline-block;
-      animation: heartbeat 1.5s infinite;
-    }
+    .footer .divider { margin: 0 0.5rem; opacity: 0.5; }
 
-    @keyframes heartbeat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-tertiary); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg-tertiary);
-      border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--text-muted);
-      border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--text-secondary);
-    }
-
-    /* Responsive Design */
     @media (max-width: 1200px) {
-      .main-content {
-        grid-template-columns: 1fr;
-      }
-
-      .test-list-container {
-        position: static;
-        max-height: 350px;
-      }
+      .main-content { grid-template-columns: 1fr; }
+      .test-list-container { position: static; max-height: 350px; }
     }
 
     @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .header {
-        padding: 1.25rem;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .header-top {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-      }
+      .container { padding: 1rem; }
+      .header { padding: 1.25rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .header-top { flex-direction: column; gap: 1rem; align-items: flex-start; }
     }
 
     @media (max-width: 480px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .filter-buttons {
-        flex-wrap: wrap;
-      }
+      .stats-grid { grid-template-columns: 1fr; }
+      .filter-buttons { flex-wrap: wrap; }
     }
 
-    /* Animations */
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -1046,14 +956,8 @@ function generateHTML(tests, config) {
       to { opacity: 1; }
     }
 
-    .test-item {
-      animation: slideIn 0.3s ease forwards;
-      opacity: 0;
-    }
-
-    .stat-card {
-      animation: fadeIn 0.5s ease forwards;
-    }
+    .test-item { animation: slideIn 0.3s ease forwards; opacity: 0; }
+    .stat-card { animation: fadeIn 0.5s ease forwards; }
 
     ${Array.from({ length: 10 }, (_, i) => `.test-item:nth-child(${i + 1}) { animation-delay: ${i * 0.05}s; }`).join('\n    ')}
   </style>
@@ -1065,33 +969,35 @@ function generateHTML(tests, config) {
     <header class="header">
       <div class="header-top">
         <div class="logo">
-          <div class="logo-icon">🦅</div>
+          <div class="logo-icon">
+            <i data-lucide="bird" class="icon-xl"></i>
+          </div>
           <div class="logo-text">
             <h1>${config.projectName}</h1>
-            <p>Generated ${timestamp}</p>
+            <p><i data-lucide="calendar" class="icon-sm"></i> ${timestamp}</p>
           </div>
         </div>
         <div class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode" role="button" tabindex="0">
-          <span class="icon sun">☀️</span>
-          <span class="icon moon">🌙</span>
+          <i data-lucide="sun" class="icon icon-sun icon-sm"></i>
+          <i data-lucide="moon" class="icon icon-moon icon-sm"></i>
         </div>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card total">
-          <div class="label">Total Tests</div>
+          <div class="label"><i data-lucide="layers" class="icon-sm"></i> Total Tests</div>
           <div class="value">${total}</div>
         </div>
         <div class="stat-card passed">
-          <div class="label">Passed</div>
+          <div class="label"><i data-lucide="check-circle" class="icon-sm"></i> Passed</div>
           <div class="value">${passed}</div>
         </div>
         <div class="stat-card failed">
-          <div class="label">Failed</div>
+          <div class="label"><i data-lucide="x-circle" class="icon-sm"></i> Failed</div>
           <div class="value">${failed}</div>
         </div>
         <div class="stat-card rate">
-          <div class="label">Pass Rate</div>
+          <div class="label"><i data-lucide="percent" class="icon-sm"></i> Pass Rate</div>
           <div class="value">${passRate}%</div>
         </div>
       </div>
@@ -1100,17 +1006,17 @@ function generateHTML(tests, config) {
     <div class="main-content">
       <aside class="test-list-container">
         <div class="test-list-header">
-          <h2>Test Results</h2>
+          <h2><i data-lucide="list" class="icon-md"></i> Test Results</h2>
           <div class="filter-buttons">
             <button class="filter-btn active" onclick="filterTests('all', this)">All</button>
-            <button class="filter-btn" onclick="filterTests('passed', this)">Passed</button>
-            <button class="filter-btn" onclick="filterTests('failed', this)">Failed</button>
+            <button class="filter-btn" onclick="filterTests('passed', this)"><i data-lucide="check" class="icon-sm"></i> Passed</button>
+            <button class="filter-btn" onclick="filterTests('failed', this)"><i data-lucide="x" class="icon-sm"></i> Failed</button>
           </div>
         </div>
         <div class="test-list" id="testList">
           ${tests.length > 0 ? tests.map((test, index) => generateTestItem(test, index)).join('') : `
             <div class="empty-state">
-              <div class="empty-state-icon">📭</div>
+              <div class="empty-state-icon"><i data-lucide="inbox" style="width:64px;height:64px;"></i></div>
               <h3>No Tests Found</h3>
               <p>Run your Detox tests to generate artifacts</p>
             </div>
@@ -1121,7 +1027,7 @@ function generateHTML(tests, config) {
       <main class="detail-panel" id="detailPanel">
         ${tests.length > 0 ? generateDetailPanel(tests[0]) : `
           <div class="empty-state">
-            <div class="empty-state-icon">🔍</div>
+            <div class="empty-state-icon"><i data-lucide="search" style="width:64px;height:64px;"></i></div>
             <h3>No Test Selected</h3>
             <p>Run tests and select one from the list to view details</p>
           </div>
@@ -1131,30 +1037,30 @@ function generateHTML(tests, config) {
 
     <footer class="footer">
       <p>
-        Built with <span class="heart">❤️</span> by
-        <a href="https://www.linkedin.com/in/gautammandewalker" target="_blank" rel="noopener">Gautam Mandewalker</a>
-        &nbsp;|&nbsp;
+        Made with care by <a href="https://www.linkedin.com/in/gautammandewalker" target="_blank" rel="noopener">Gautam Mandewalker</a>
+        <span class="divider">|</span>
         <a href="https://github.com/eagleisbatman/eagle-mobile-e2e-testing" target="_blank" rel="noopener">Eagle Mobile E2E Testing</a>
+        <span class="divider">|</span>
+        Icons by <a href="https://lucide.dev" target="_blank" rel="noopener">Lucide</a>
       </p>
     </footer>
   </div>
 
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
+    <div class="lightbox-close" onclick="closeLightbox()">
+      <i data-lucide="x" class="icon-lg"></i>
+    </div>
     <img id="lightboxImage" src="" alt="Screenshot">
   </div>
 
   <script>
-    // Test data embedded
     const testsData = ${JSON.stringify(tests, (key, value) => {
-      // Don't include full file paths in JSON for security, just names
       if (key === 'path') return undefined;
       return value;
     }, 2)};
 
     let currentTestIndex = 0;
 
-    // Theme management
     function toggleTheme() {
       const html = document.documentElement;
       const currentTheme = html.getAttribute('data-theme');
@@ -1163,7 +1069,6 @@ function generateHTML(tests, config) {
       localStorage.setItem('eagle-report-theme', newTheme);
     }
 
-    // Initialize theme based on saved preference or system preference
     (function initTheme() {
       const savedTheme = localStorage.getItem('eagle-report-theme');
       if (savedTheme) {
@@ -1173,14 +1078,12 @@ function generateHTML(tests, config) {
       }
     })();
 
-    // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
       if (!localStorage.getItem('eagle-report-theme')) {
         document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
       }
     });
 
-    // Format duration helper
     function formatDuration(ms) {
       if (!ms) return '';
       if (ms < 1000) return ms + 'ms';
@@ -1188,32 +1091,28 @@ function generateHTML(tests, config) {
       return (ms / 60000).toFixed(1) + 'm';
     }
 
-    // Filter tests
     function filterTests(status, btn) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
       document.querySelectorAll('.test-item').forEach(item => {
         const itemStatus = item.getAttribute('data-status');
         item.style.display = (status === 'all' || itemStatus === status) ? 'block' : 'none';
       });
     }
 
-    // Select test
     function selectTest(index) {
       currentTestIndex = index;
       document.querySelectorAll('.test-item').forEach((item, i) => {
         item.classList.toggle('active', i === index);
       });
-
       const detailPanel = document.getElementById('detailPanel');
       detailPanel.innerHTML = generateDetailHTML(testsData[index]);
+      lucide.createIcons();
     }
 
-    // Generate detail HTML dynamically
     function generateDetailHTML(test) {
       if (!test) {
-        return '<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Select a Test</h3><p>Choose a test from the list</p></div>';
+        return '<div class="empty-state"><div class="empty-state-icon"><i data-lucide="search" style="width:64px;height:64px;"></i></div><h3>Select a Test</h3><p>Choose a test from the list</p></div>';
       }
 
       let html = \`
@@ -1221,8 +1120,11 @@ function generateHTML(tests, config) {
           <div class="detail-title">
             <h2>\${test.name}</h2>
             <div class="detail-badges">
-              <span class="badge \${test.status}">\${test.status.toUpperCase()}</span>
-              \${test.duration ? \`<span class="badge duration">⏱ \${formatDuration(test.duration)}</span>\` : ''}
+              <span class="badge \${test.status}">
+                <i data-lucide="\${test.status === 'passed' ? 'check-circle' : test.status === 'failed' ? 'x-circle' : 'alert-circle'}" class="icon-sm"></i>
+                \${test.status.toUpperCase()}
+              </span>
+              \${test.duration ? \`<span class="badge duration"><i data-lucide="clock" class="icon-sm"></i> \${formatDuration(test.duration)}</span>\` : ''}
             </div>
           </div>
         </div>
@@ -1235,7 +1137,7 @@ function generateHTML(tests, config) {
             </video>
           \` : \`
             <div class="no-video">
-              <div class="no-video-icon">🎬</div>
+              <div class="no-video-icon"><i data-lucide="video-off" style="width:64px;height:64px;"></i></div>
               <p>No video recording available</p>
             </div>
           \`}
@@ -1245,7 +1147,7 @@ function generateHTML(tests, config) {
       if (test.error) {
         html += \`
           <div class="error-section">
-            <div class="error-title">❌ Error Details</div>
+            <div class="error-title"><i data-lucide="alert-triangle" class="icon-md"></i> Error Details</div>
             <div class="error-message">\${test.error}</div>
           </div>
         \`;
@@ -1254,7 +1156,7 @@ function generateHTML(tests, config) {
       if (test.screenshots && test.screenshots.length > 0) {
         html += \`
           <div class="screenshots-section">
-            <div class="section-title">📷 Screenshots (\${test.screenshots.length})</div>
+            <div class="section-title"><i data-lucide="image" class="icon-md"></i> Screenshots (\${test.screenshots.length})</div>
             <div class="screenshots-grid">
               \${test.screenshots.map(s => \`
                 <div class="screenshot-item" onclick="openLightbox('\${s.name}')">
@@ -1270,7 +1172,7 @@ function generateHTML(tests, config) {
       if (test.steps && test.steps.length > 0) {
         html += \`
           <div class="steps-section">
-            <div class="section-title">📋 Test Steps</div>
+            <div class="section-title"><i data-lucide="list-checks" class="icon-md"></i> Test Steps</div>
             <div class="steps-timeline">
               \${test.steps.map(step => \`
                 <div class="step-item \${step.status || 'success'}">
@@ -1286,7 +1188,6 @@ function generateHTML(tests, config) {
       return html;
     }
 
-    // Lightbox functions
     function openLightbox(src) {
       const img = document.getElementById('lightboxImage');
       img.src = src;
@@ -1299,13 +1200,9 @@ function generateHTML(tests, config) {
       document.body.style.overflow = '';
     }
 
-    // Keyboard navigation
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeLightbox();
-      }
+      if (e.key === 'Escape') closeLightbox();
       if (document.getElementById('lightbox').classList.contains('active')) return;
-
       if (e.key === 'ArrowUp' || e.key === 'k') {
         if (currentTestIndex > 0) selectTest(currentTestIndex - 1);
         e.preventDefault();
@@ -1316,12 +1213,16 @@ function generateHTML(tests, config) {
       }
     });
 
-    // Theme toggle with keyboard
     document.querySelector('.theme-toggle').addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         toggleTheme();
         e.preventDefault();
       }
+    });
+
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
     });
   </script>
 </body>
@@ -1339,8 +1240,11 @@ function generateDetailPanel(test) {
       <div class="detail-title">
         <h2>${test.name}</h2>
         <div class="detail-badges">
-          <span class="badge ${test.status}">${test.status.toUpperCase()}</span>
-          ${test.duration ? `<span class="badge duration">⏱ ${formatDuration(test.duration)}</span>` : ''}
+          <span class="badge ${test.status}">
+            <i data-lucide="${test.status === 'passed' ? 'check-circle' : test.status === 'failed' ? 'x-circle' : 'alert-circle'}" class="icon-sm"></i>
+            ${test.status.toUpperCase()}
+          </span>
+          ${test.duration ? `<span class="badge duration"><i data-lucide="clock" class="icon-sm"></i> ${formatDuration(test.duration)}</span>` : ''}
         </div>
       </div>
     </div>
@@ -1353,7 +1257,7 @@ function generateDetailPanel(test) {
         </video>
       ` : `
         <div class="no-video">
-          <div class="no-video-icon">🎬</div>
+          <div class="no-video-icon"><i data-lucide="video-off" style="width:64px;height:64px;"></i></div>
           <p>No video recording available</p>
         </div>
       `}
@@ -1363,7 +1267,7 @@ function generateDetailPanel(test) {
   if (test.error) {
     html += `
       <div class="error-section">
-        <div class="error-title">❌ Error Details</div>
+        <div class="error-title"><i data-lucide="alert-triangle" class="icon-md"></i> Error Details</div>
         <div class="error-message">${test.error}</div>
       </div>
     `;
@@ -1372,7 +1276,7 @@ function generateDetailPanel(test) {
   if (test.screenshots && test.screenshots.length > 0) {
     html += `
       <div class="screenshots-section">
-        <div class="section-title">📷 Screenshots (${test.screenshots.length})</div>
+        <div class="section-title"><i data-lucide="image" class="icon-md"></i> Screenshots (${test.screenshots.length})</div>
         <div class="screenshots-grid">
           ${test.screenshots.map(s => `
             <div class="screenshot-item" onclick="openLightbox('${path.basename(s.path)}')">
@@ -1388,7 +1292,7 @@ function generateDetailPanel(test) {
   if (test.steps && test.steps.length > 0) {
     html += `
       <div class="steps-section">
-        <div class="section-title">📋 Test Steps</div>
+        <div class="section-title"><i data-lucide="list-checks" class="icon-md"></i> Test Steps</div>
         <div class="steps-timeline">
           ${test.steps.map(step => `
             <div class="step-item ${step.status || 'success'}">
@@ -1409,40 +1313,37 @@ function generateDetailPanel(test) {
  */
 function main() {
   console.log('');
-  console.log('🦅 Eagle Mobile E2E Testing - Report Generator');
-  console.log('━'.repeat(50));
-  console.log(`📁 Artifacts: ${CONFIG.artifactsDir}`);
-  console.log(`📄 Output: ${CONFIG.outputDir}/${CONFIG.reportName}.html`);
-  console.log(`🏷️  Project: ${CONFIG.projectName}`);
+  console.log('Eagle Mobile E2E Testing - Report Generator');
+  console.log('─'.repeat(50));
+  console.log(`Artifacts:  ${CONFIG.artifactsDir}`);
+  console.log(`Output:     ${CONFIG.outputDir}/${CONFIG.reportName}.html`);
+  console.log(`Project:    ${CONFIG.projectName}`);
+  console.log(`Icons:      Lucide (https://lucide.dev) - MIT License`);
   console.log('');
 
-  // Scan for test artifacts
   const tests = scanArtifacts(CONFIG.artifactsDir);
-
   const passed = tests.filter(t => t.status === 'passed').length;
   const failed = tests.filter(t => t.status === 'failed').length;
 
-  console.log(`📊 Found ${tests.length} test(s)`);
-  console.log(`   ✅ Passed: ${passed}`);
-  console.log(`   ❌ Failed: ${failed}`);
+  console.log(`Found ${tests.length} test(s)`);
+  console.log(`  Passed: ${passed}`);
+  console.log(`  Failed: ${failed}`);
   console.log('');
 
-  // Create output directory
   if (!fs.existsSync(CONFIG.outputDir)) {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
   }
 
-  // Generate HTML report
   const html = generateHTML(tests, CONFIG);
   const outputPath = path.join(CONFIG.outputDir, `${CONFIG.reportName}.html`);
   fs.writeFileSync(outputPath, html);
 
-  console.log(`✅ Report generated successfully!`);
+  console.log(`Report generated successfully!`);
   console.log('');
-  console.log(`🌐 Open in browser:`);
-  console.log(`   file://${path.resolve(outputPath)}`);
+  console.log(`Open in browser:`);
+  console.log(`  file://${path.resolve(outputPath)}`);
   console.log('');
-  console.log('💡 Tip: Use --help for all options');
+  console.log('Tip: Use --help for all options');
   console.log('');
 }
 

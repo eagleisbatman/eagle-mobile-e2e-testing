@@ -1683,6 +1683,72 @@ device.sendUserNotification({ ... })
 
 ---
 
+## Example Test Files
+
+The skill includes comprehensive example tests covering common app patterns:
+
+### Authentication Examples
+| File | Description |
+|------|-------------|
+| `login-flow.test.ts` | Complete login flow with validation and navigation |
+| `registration-flow.test.ts` | User registration with email verification |
+| `password-reset.test.ts` | Password reset via email and security questions |
+| `two-factor-auth.test.ts` | SMS, TOTP, and backup code verification |
+
+### Navigation Examples
+| File | Description |
+|------|-------------|
+| `tab-navigation.test.ts` | Bottom tab bar, state persistence, badges |
+| `drawer-navigation.test.ts` | Hamburger menu, nested sections, logout |
+| `deep-linking.test.ts` | URL schemes, universal links, auth-required links |
+
+### Form and Search Examples
+| File | Description |
+|------|-------------|
+| `form-validation.test.ts` | Real-time validation, password strength, submission |
+| `search-filter.test.ts` | Search, suggestions, filters, sorting, history |
+
+### Media Examples
+| File | Description |
+|------|-------------|
+| `video-player.test.ts` | Playback controls, fullscreen, quality, subtitles |
+| `audio-player.test.ts` | Music player, shuffle/repeat, queue, background |
+| `image-gallery.test.ts` | Grid view, zoom, albums, selection mode |
+
+### Productivity Examples
+| File | Description |
+|------|-------------|
+| `calendar-scheduling.test.ts` | Views, events, reminders, recurring |
+| `file-management.test.ts` | Browsing, folders, uploads, file actions |
+| `notes-editor.test.ts` | Rich text, organization, tags, search |
+
+### Settings Examples
+| File | Description |
+|------|-------------|
+| `user-settings.test.ts` | Profile, account, preferences, privacy |
+| `notification-settings.test.ts` | Push, email, DND, sound/vibration |
+
+### Domain-Specific Examples
+| File | Description |
+|------|-------------|
+| `e-commerce.test.ts` | Product browsing, cart, checkout, orders |
+| `social-media.test.ts` | Feed, posts, stories, profiles, interactions |
+| `messaging-chat.test.ts` | Conversations, real-time, media, typing indicators |
+| `onboarding-tutorial.test.ts` | Carousels, permissions, personalization |
+| `gaming-entertainment.test.ts` | Menus, IAP, leaderboards, achievements |
+| `banking-finance.test.ts` | Accounts, transactions, transfers, bill pay |
+| `fitness-tracker.test.ts` | Activity tracking, workouts, goals, health |
+| `maps-location.test.ts` | Map views, search, directions, places |
+
+### Special Topics
+| File | Description |
+|------|-------------|
+| `permissions.test.ts` | Camera, location, notifications, biometrics |
+| `advanced-features.test.ts` | Deep links, offline mode, background states |
+| `accessibility.test.ts` | Screen reader, dynamic type, contrast, focus |
+
+---
+
 ## External Resources
 
 - [Detox Documentation](https://wix.github.io/Detox/)
@@ -1690,3 +1756,4 @@ device.sendUserNotification({ ... })
 - [Wix Pilot (AI Testing)](https://github.com/wix-incubator/pilot)
 - [Detox Instruments](https://github.com/wix-incubator/DetoxInstruments)
 - [Firebase DebugView](https://firebase.google.com/docs/analytics/debugview)
+- [Lucide Icons](https://lucide.dev/) - Icons used in HTML reports
