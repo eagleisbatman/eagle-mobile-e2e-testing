@@ -310,8 +310,23 @@ module.exports = {
 
 See `references/detox-config.md` for complete configuration options.
 
+## Detox Copilot (Natural Language Testing)
+
+Built-in LLM-powered testing - write tests in plain English:
+
+```typescript
+await copilot.perform(
+  'Navigate to the Products page',
+  'Add the first item to cart',
+  'Verify cart badge shows 1'
+);
+```
+
+See SKILL.md for full setup instructions.
+
 ## External Links
 
 - [Detox Documentation](https://wix.github.io/Detox/)
+- [Detox Copilot](https://wix.github.io/Detox/docs/copilot/testing-with-copilot)
 - [Agent Skills Specification](https://agentskills.io/specification)
 - [AGENTS.md Standard](https://agents.md/)

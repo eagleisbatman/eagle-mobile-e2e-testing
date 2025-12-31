@@ -3,7 +3,7 @@ name: eagle-mobile-e2e-testing
 description: |
   Production-grade E2E testing for React Native (Expo/CLI), iOS (SwiftUI/UIKit), and Android (Compose/XML) using Detox.
   CRITICAL: Before writing tests, discover UI via grep (not file dumps). Run builds/tests in BACKGROUND.
-  Covers: Detox setup, test patterns, AI generation (Wix Pilot), video/screenshots, HTML reports,
+  Covers: Detox setup, test patterns, AI generation (Detox Copilot, Wix Pilot), video/screenshots, HTML reports,
   permissions, biometrics, deep links, offline mode, network mocking, push notifications, CI/CD.
 license: MIT
 metadata:
@@ -1775,7 +1775,10 @@ expect(element).not.toBeVisible()
 expect(element).toHaveText('text')
 expect(element).toHaveLabel('label')
 expect(element).toHaveId('id')
+expect(element).toHaveValue('value')
 expect(element).toBeFocused()
+expect(element).toHaveSliderPosition(0.5, 0.1)  // position, tolerance
+expect(element).toHaveToggleValue(true)         // toggle/switch state
 ```
 
 ### waitFor
@@ -1809,6 +1812,10 @@ device.matchFinger()
 device.setOrientation('landscape')
 device.openURL({ url: 'myapp://path' })
 device.sendUserNotification({ ... })
+device.tap({ x: 100, y: 200 })        // Tap at coordinates (v20+)
+device.longPress({ x: 100, y: 200 })  // Long press at coordinates (v20+)
+device.generateViewHierarchyXml()    // Get XML for debugging
+device.getUiDevice()                  // Android UiAutomator access
 ```
 
 ---
@@ -1975,6 +1982,90 @@ report-hub/
 
 ---
 
+## Detox Copilot - Built-in Natural Language Testing
+
+Detox Copilot is a newer alternative to Wix Pilot that's built directly into Detox. It uses LLMs to interpret natural language instructions and translate them into Detox actions.
+
+### Key Advantages
+
+| Feature | Benefit |
+|---------|---------|
+| **Built-in** | No additional installation - part of Detox |
+| **LLM-Agnostic** | Works with GPT, Gemini, Claude, or any LLM |
+| **Lower Maintenance** | Tests less brittle to UI changes |
+| **Team Collaboration** | Non-technical team members can understand tests |
+
+### Setup
+
+```typescript
+// e2e/setup.ts
+const { copilot } = require('detox');
+
+// Create a prompt handler for your LLM
+class OpenAIPromptHandler {
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+  }
+
+  async runPrompt(prompt, image) {
+    // Send prompt to OpenAI API and return response
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4-vision-preview',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    return (await response.json()).choices[0].message.content;
+  }
+}
+
+beforeAll(() => {
+  const promptHandler = new OpenAIPromptHandler(process.env.OPENAI_API_KEY);
+  copilot.init(promptHandler);
+});
+```
+
+### Writing Tests with Copilot
+
+```typescript
+describe('Shopping Flow', () => {
+  it('should add product to cart', async () => {
+    await copilot.perform(
+      'Navigate to the "Products" page',
+      'Tap on the "Add to Cart" button for the first product',
+      'Verify that the cart badge shows "1"'
+    );
+  });
+
+  it('should complete checkout', async () => {
+    await copilot.perform(
+      'Open the cart',
+      'Tap "Proceed to Checkout"',
+      'Fill in the shipping address form',
+      'Confirm the order',
+      'Verify order confirmation message is displayed'
+    );
+  });
+});
+```
+
+### When to Use Copilot vs Traditional Tests
+
+| Use Case | Recommendation |
+|----------|----------------|
+| Quick prototyping | Copilot |
+| CI/CD pipelines | Traditional (more deterministic) |
+| Complex assertions | Traditional |
+| Cross-team collaboration | Copilot |
+| Performance-critical | Traditional |
+
+---
+
 ## Additional Ideas for Enhancement
 
 Future improvements that can be added to this skill:
@@ -1996,7 +2087,8 @@ Future improvements that can be added to this skill:
 
 - [Detox Documentation](https://wix.github.io/Detox/)
 - [Detox GitHub](https://github.com/wix/Detox)
-- [Wix Pilot (AI Testing)](https://github.com/wix-incubator/pilot)
+- [Detox Copilot Guide](https://wix.github.io/Detox/docs/copilot/testing-with-copilot) - Built-in natural language testing
+- [Wix Pilot (AI Testing)](https://github.com/wix-incubator/pilot) - Alternative AI test generation
 - [Detox Instruments](https://github.com/wix-incubator/DetoxInstruments)
 - [Firebase DebugView](https://firebase.google.com/docs/analytics/debugview)
 - [Lucide Icons](https://lucide.dev/) - Icons used in HTML reports
