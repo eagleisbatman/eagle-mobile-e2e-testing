@@ -1804,7 +1804,8 @@ device.sendUserNotification({ ... })
 - `references/pilot-setup.md` - AI-powered testing with Wix Pilot
 - `references/ci-workflows.md` - GitHub Actions, CircleCI, Bitrise
 - `scripts/run-e2e.sh` - Automated test runner script
-- `scripts/generate-report.js` - HTML report generator
+- `scripts/generate-report.js` - Standalone HTML report generator
+- `scripts/report-hub.js` - Consolidated dashboard for multiple test sessions
 
 ---
 
@@ -1871,6 +1872,107 @@ The skill includes comprehensive example tests covering common app patterns:
 | `permissions.test.ts` | Camera, location, notifications, biometrics |
 | `advanced-features.test.ts` | Deep links, offline mode, background states |
 | `accessibility.test.ts` | Screen reader, dynamic type, contrast, focus |
+
+---
+
+## Report Hub - Consolidated Test Dashboard
+
+Instead of generating separate reports for each test run, use the **Report Hub** to create a single dashboard where QAs can browse all test sessions.
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| **Session Navigation** | Side menu lists all test runs by date/feature |
+| **Append Mode** | New test runs are added to existing hub |
+| **Pass Rate Trends** | Visual chart showing trends across runs |
+| **Test Filtering** | Filter by passed/failed/all within sessions |
+| **Video Playback** | Embedded video player for recordings |
+| **Screenshot Gallery** | Lightbox viewer for all screenshots |
+| **Search** | Search across sessions by name |
+| **Export** | Export individual sessions as JSON |
+| **Dark/Light Mode** | Theme toggle with system preference detection |
+
+### Usage
+
+```bash
+# First run - creates new hub
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Login Flow"
+
+# Subsequent runs - appends to existing hub
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Checkout Flow"
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Registration"
+
+# Each run adds a new session to the sidebar navigation
+```
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--artifacts` | Path to Detox artifacts directory | `./e2e/artifacts` |
+| `--hub` | Path to report hub output directory | `./report-hub` |
+| `--session` | Session name (appears in sidebar) | Timestamp |
+| `--project` | Project name for dashboard header | "E2E Test Hub" |
+
+### Directory Structure
+
+```
+report-hub/
+├── index.html          # Main dashboard (auto-regenerated)
+├── data/
+│   ├── login-flow.json
+│   ├── checkout-flow.json
+│   └── registration.json
+└── assets/
+    ├── login-flow_video.mp4
+    ├── login-flow_screenshot.png
+    └── ...
+```
+
+### QA Workflow
+
+1. **Run tests by feature area**: `npx detox test e2e/flows/auth/`
+2. **Add to hub**: `node scripts/report-hub.js --session "Auth - Login"`
+3. **Run more tests**: `npx detox test e2e/flows/checkout/`
+4. **Append to hub**: `node scripts/report-hub.js --session "Checkout - Cart"`
+5. **Open hub**: Single `index.html` shows all sessions in sidebar
+
+### CI/CD Integration
+
+```yaml
+# Add to your CI workflow
+- name: Generate Report Hub
+  run: |
+    node scripts/report-hub.js \
+      --artifacts ./e2e/artifacts \
+      --hub ./report-hub \
+      --session "${{ github.run_id }}-${{ matrix.test-suite }}" \
+      --project "MyApp E2E Tests"
+
+- name: Upload Report Hub
+  uses: actions/upload-artifact@v4
+  with:
+    name: e2e-report-hub
+    path: report-hub/
+```
+
+---
+
+## Additional Ideas for Enhancement
+
+Future improvements that can be added to this skill:
+
+| Idea | Description | Complexity |
+|------|-------------|------------|
+| **Test Coverage Map** | Visual diagram showing which screens have E2E coverage | Medium |
+| **Flaky Test Detection** | Track tests that intermittently fail across runs | Medium |
+| **Performance Trending** | Chart execution times over multiple runs | Low |
+| **Screenshot Diff** | Compare screenshots between runs to detect UI regressions | High |
+| **Slack Integration** | Send test summaries to Slack/Teams channels | Low |
+| **Test Prioritization** | AI-powered suggestions for which tests to run based on code changes | High |
+| **Parallel Test Runner** | Split tests across multiple simulators/emulators | Medium |
+| **Device Farm Integration** | Connect to AWS Device Farm or Firebase Test Lab | High |
 
 ---
 

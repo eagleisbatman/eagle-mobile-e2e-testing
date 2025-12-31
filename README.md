@@ -58,16 +58,42 @@ These practices ensure smooth, efficient test development without overwhelming y
 
 ### Step 1 — Install the Skill
 
+Choose your preferred installation method:
+
+**Option A: Clone to skills directory (Recommended)**
 ```bash
-# Clone to your Claude Code skills directory
-git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/eagle-mobile-e2e-testing
+# Clone to Claude Code skills directory
+git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/mobile-e2e-testing
+
+# Verify installation
+ls ~/.claude/skills/mobile-e2e-testing/SKILL.md
+```
+
+**Option B: Add via Claude Code settings**
+```bash
+# Open Claude Code settings
+claude config
+
+# Add to skills array in settings:
+# "skills": ["~/.claude/skills/mobile-e2e-testing"]
+```
+
+**Option C: One-liner installation**
+```bash
+mkdir -p ~/.claude/skills && git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/mobile-e2e-testing
 ```
 
 ### Step 2 — Restart Claude Code
 
-The skill loads automatically and becomes available in your conversations.
+Close and reopen Claude Code. The skill loads automatically from `~/.claude/skills/`.
 
-### Step 3 — Start Testing
+### Step 3 — Verify Installation
+
+In Claude Code, you should see the skill available. You can verify by asking:
+
+> *"What mobile testing capabilities do you have?"*
+
+### Step 4 — Start Testing
 
 Just ask Claude:
 
@@ -133,9 +159,31 @@ The included report generator creates beautiful, interactive reports with:
 - **Professional icons** — using Lucide icon library (open source)
 
 ```bash
-# Generate a report
+# Generate a standalone report
 node scripts/generate-report.js --artifacts ./artifacts --output ./reports --project "My App"
 ```
+
+### Report Hub — Consolidated Test Dashboard
+
+For QA teams running multiple test sessions, the **Report Hub** creates a single dashboard with side navigation to browse all test runs:
+
+```bash
+# First run - creates hub
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Login Flow"
+
+# Subsequent runs - appends to existing hub
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Checkout"
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Registration"
+```
+
+| Feature | Description |
+|---------|-------------|
+| Session Navigation | Side menu lists all test runs |
+| Append Mode | New runs added to existing hub |
+| Pass Rate Trends | Visual chart across runs |
+| Test Filtering | Filter by passed/failed |
+| Video Playback | Embedded player |
+| Dark/Light Mode | Theme toggle |
 
 ---
 
@@ -317,7 +365,8 @@ eagle-mobile-e2e-testing/
 │   └── ci-workflows.md           # CI/CD configurations
 ├── scripts/
 │   ├── run-e2e.sh                # Automated test runner
-│   └── generate-report.js        # HTML report generator with Lucide icons
+│   ├── generate-report.js        # Standalone HTML report generator
+│   └── report-hub.js             # Consolidated dashboard (multi-session)
 ├── examples/                     # 28 comprehensive test examples
 │   ├── login-flow.test.ts        # Authentication patterns
 │   ├── registration-flow.test.ts # User registration
