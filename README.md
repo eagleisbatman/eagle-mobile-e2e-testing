@@ -377,7 +377,7 @@ eagle-mobile-e2e-testing/
 │   └── ...                       # 22 more examples
 └── .github/
     └── workflows/
-        └── e2e-tests.yml         # GitHub Actions workflow
+        └── e2e-tests.yml.template  # GitHub Actions template (copy to your project)
 ```
 
 ---
