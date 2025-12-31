@@ -1,0 +1,260 @@
+# GitHub Actions Workflow for Detox E2E Tests
+# This workflow runs end-to-end tests on iOS and Android
+
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  # Common environment variables
+  NODE_VERSION: '18'
+  JAVA_VERSION: '17'
+
+jobs:
+  # iOS E2E Tests
+  ios-e2e:
+    name: iOS E2E Tests
+    runs-on: macos-14 # macOS Sonoma with Xcode 15
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Detox CLI
+        run: npm install -g detox-cli
+
+      - name: Install applesimutils
+        run: |
+          brew tap wix/brew
+          brew install applesimutils
+
+      - name: Setup iOS Simulator
+        run: |
+          # List available simulators
+          xcrun simctl list devices available
+
+          # Boot a simulator (iPhone 15)
+          SIMULATOR_UDID=$(xcrun simctl list devices available | grep "iPhone 15" | head -1 | grep -oE '[A-F0-9-]{36}')
+          xcrun simctl boot "$SIMULATOR_UDID" || true
+
+      - name: Cache Pods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+
+      - name: Build iOS App (Debug)
+        run: npx detox build --configuration ios.sim.debug
+
+      - name: Run E2E Tests (iOS)
+        run: |
+          npx detox test \
+            --configuration ios.sim.debug \
+            --record-videos failing \
+            --take-screenshots failing \
+            --record-logs all \
+            --headless \
+            --cleanup
+
+      - name: Upload Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-e2e-artifacts
+          path: |
+            e2e/artifacts/
+            e2e/reports/
+          retention-days: 14
+
+  # Android E2E Tests
+  android-e2e:
+    name: Android E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Detox CLI
+        run: npm install -g detox-cli
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Cache Android Emulator
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-api-33-${{ runner.os }}
+
+      - name: Create AVD and generate snapshot
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: Pixel 4
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Build Android App (Debug)
+        run: npx detox build --configuration android.emu.debug
+
+      - name: Run E2E Tests (Android)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: Pixel 4
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            npx detox test \
+              --configuration android.emu.debug \
+              --record-videos failing \
+              --take-screenshots failing \
+              --record-logs all \
+              --headless
+
+      - name: Upload Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-e2e-artifacts
+          path: |
+            e2e/artifacts/
+            e2e/reports/
+          retention-days: 14
+
+  # Generate Combined Report
+  report:
+    name: Generate Test Report
+    runs-on: ubuntu-latest
+    needs: [ios-e2e, android-e2e]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download iOS Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-e2e-artifacts
+          path: ios-artifacts
+        continue-on-error: true
+
+      - name: Download Android Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-e2e-artifacts
+          path: android-artifacts
+        continue-on-error: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Generate Combined Report
+        run: |
+          mkdir -p combined-report
+
+          # Copy artifacts
+          cp -r ios-artifacts/* combined-report/ 2>/dev/null || true
+          cp -r android-artifacts/* combined-report/ 2>/dev/null || true
+
+          # Generate summary (you can customize this)
+          echo "# E2E Test Report" > combined-report/summary.md
+          echo "" >> combined-report/summary.md
+          echo "## iOS Tests" >> combined-report/summary.md
+          if [ -f ios-artifacts/reports/junit.xml ]; then
+            echo "iOS tests completed. See artifacts for details." >> combined-report/summary.md
+          else
+            echo "iOS tests did not complete or failed." >> combined-report/summary.md
+          fi
+          echo "" >> combined-report/summary.md
+          echo "## Android Tests" >> combined-report/summary.md
+          if [ -f android-artifacts/reports/junit.xml ]; then
+            echo "Android tests completed. See artifacts for details." >> combined-report/summary.md
+          else
+            echo "Android tests did not complete or failed." >> combined-report/summary.md
+          fi
+
+      - name: Upload Combined Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-e2e-report
+          path: combined-report/
+          retention-days: 30
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ios = '${{ needs.ios-e2e.result }}';
+            const android = '${{ needs.android-e2e.result }}';
+
+            let body = '## E2E Test Results\n\n';
+            body += `| Platform | Status |\n`;
+            body += `|----------|--------|\n`;
+            body += `| iOS | ${ios === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
+            body += `| Android | ${android === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
+            body += '\n[View artifacts for detailed reports and video recordings](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

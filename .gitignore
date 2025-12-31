@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.tgz
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test artifacts (don't commit test outputs)
+e2e/artifacts/
+e2e/reports/
+artifacts/
+reports/
+*.mp4
+*.mov
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Cache
+.cache/
+.npm/
+.yarn/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
