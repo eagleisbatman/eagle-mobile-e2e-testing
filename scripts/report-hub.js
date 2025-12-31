@@ -31,8 +31,28 @@ const getArg = (name) => {
 
 const artifactsPath = getArg('artifacts') || './e2e/artifacts';
 const hubPath = getArg('hub') || './report-hub';
-const sessionName = getArg('session') || new Date().toISOString().replace(/[:.]/g, '-');
+const rawSessionName = getArg('session') || new Date().toISOString().replace(/[:.]/g, '-');
 const projectName = getArg('project') || 'E2E Test Hub';
+
+// Sanitize session name for filesystem safety
+const sanitizeFilename = (name) => {
+  return name.replace(/[<>:"/\\|?*]/g, '-').replace(/\s+/g, '-').substring(0, 100);
+};
+
+// Escape HTML to prevent XSS
+const escapeHtml = (str) => {
+  const htmlEntities = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return String(str).replace(/[&<>"']/g, c => htmlEntities[c]);
+};
+
+const sessionName = rawSessionName;
+const safeSessionFilename = sanitizeFilename(rawSessionName);
 
 // Ensure hub directory structure exists
 const dataPath = path.join(hubPath, 'data');
@@ -46,7 +66,7 @@ console.log(`[Report Hub] Session name: ${sessionName}`);
 // Collect test results from artifacts
 function collectTestResults(artifactsDir) {
   const results = {
-    id: sessionName,
+    id: safeSessionFilename,
     timestamp: new Date().toISOString(),
     name: sessionName,
     tests: [],
@@ -54,26 +74,37 @@ function collectTestResults(artifactsDir) {
   };
 
   if (!fs.existsSync(artifactsDir)) {
-    console.log(`[Report Hub] No artifacts directory found at ${artifactsDir}`);
+    console.log(`[Report Hub] Warning: No artifacts directory found at ${artifactsDir}`);
+    console.log(`[Report Hub] Creating empty session. Run tests first to generate artifacts.`);
     return results;
   }
 
   // Find all test directories
-  const items = fs.readdirSync(artifactsDir);
+  let items;
+  try {
+    items = fs.readdirSync(artifactsDir);
+  } catch (err) {
+    console.error(`[Report Hub] Error reading artifacts directory: ${err.message}`);
+    return results;
+  }
 
   for (const item of items) {
     const itemPath = path.join(artifactsDir, item);
-    const stat = fs.statSync(itemPath);
 
-    if (stat.isDirectory()) {
-      const test = processTestDirectory(item, itemPath, assetsPath);
-      if (test) {
-        results.tests.push(test);
-        results.summary.total++;
-        if (test.status === 'passed') results.summary.passed++;
-        else results.summary.failed++;
-        results.summary.duration += test.duration || 0;
+    try {
+      const stat = fs.statSync(itemPath);
+      if (stat.isDirectory()) {
+        const test = processTestDirectory(item, itemPath, assetsPath);
+        if (test) {
+          results.tests.push(test);
+          results.summary.total++;
+          if (test.status === 'passed') results.summary.passed++;
+          else results.summary.failed++;
+          results.summary.duration += test.duration || 0;
+        }
       }
+    } catch (err) {
+      console.warn(`[Report Hub] Warning: Could not process ${item}: ${err.message}`);
     }
   }
 
@@ -82,7 +113,7 @@ function collectTestResults(artifactsDir) {
 
 function processTestDirectory(name, dirPath, assetsDir) {
   const test = {
-    id: name,
+    id: sanitizeFilename(name),
     name: formatTestName(name),
     status: 'passed',
     duration: 0,
@@ -91,29 +122,47 @@ function processTestDirectory(name, dirPath, assetsDir) {
     logs: []
   };
 
-  const files = fs.readdirSync(dirPath);
+  let files;
+  try {
+    files = fs.readdirSync(dirPath);
+  } catch (err) {
+    console.warn(`[Report Hub] Warning: Could not read directory ${dirPath}: ${err.message}`);
+    return null;
+  }
 
   for (const file of files) {
     const filePath = path.join(dirPath, file);
     const ext = path.extname(file).toLowerCase();
 
     // Copy assets to hub
-    const assetName = `${name}_${file}`;
+    const assetName = `${sanitizeFilename(name)}_${sanitizeFilename(file)}`;
     const assetDest = path.join(assetsDir, assetName);
 
-    if (['.png', '.jpg', '.jpeg'].includes(ext)) {
-      fs.copyFileSync(filePath, assetDest);
-      test.screenshots.push(assetName);
-    } else if (['.mp4', '.mov', '.webm'].includes(ext)) {
-      fs.copyFileSync(filePath, assetDest);
-      test.videos.push(assetName);
-    } else if (['.log', '.txt'].includes(ext)) {
-      fs.copyFileSync(filePath, assetDest);
-      test.logs.push(assetName);
+    try {
+      if (['.png', '.jpg', '.jpeg', '.gif', '.webp'].includes(ext)) {
+        fs.copyFileSync(filePath, assetDest);
+        test.screenshots.push(assetName);
+      } else if (['.mp4', '.mov', '.webm', '.avi'].includes(ext)) {
+        fs.copyFileSync(filePath, assetDest);
+        test.videos.push(assetName);
+      } else if (['.log', '.txt', '.json'].includes(ext)) {
+        fs.copyFileSync(filePath, assetDest);
+        test.logs.push(assetName);
+      }
+    } catch (err) {
+      console.warn(`[Report Hub] Warning: Could not copy ${file}: ${err.message}`);
     }
 
-    // Check for failure indicators
-    if (file.includes('fail') || file.includes('error')) {
+    // Check for failure indicators (more specific patterns)
+    // Only match files that are clearly failure artifacts, not test names
+    const lowerFile = file.toLowerCase();
+    if (lowerFile.startsWith('fail') ||
+        lowerFile.includes('.fail.') ||
+        lowerFile.includes('_fail_') ||
+        lowerFile.includes('-fail-') ||
+        lowerFile.endsWith('-failed.png') ||
+        lowerFile.endsWith('-error.png') ||
+        lowerFile.includes('.error.')) {
       test.status = 'failed';
     }
   }
@@ -130,26 +179,43 @@ function formatTestName(name) {
 
 // Save session data
 const sessionData = collectTestResults(artifactsPath);
-const sessionFile = path.join(dataPath, `${sessionName}.json`);
-fs.writeFileSync(sessionFile, JSON.stringify(sessionData, null, 2));
-console.log(`[Report Hub] Session data saved: ${sessionFile}`);
+const sessionFile = path.join(dataPath, `${safeSessionFilename}.json`);
+
+try {
+  fs.writeFileSync(sessionFile, JSON.stringify(sessionData, null, 2));
+  console.log(`[Report Hub] Session data saved: ${sessionFile}`);
+} catch (err) {
+  console.error(`[Report Hub] Error saving session data: ${err.message}`);
+  process.exit(1);
+}
 
 // Generate hub index.html
 function generateHubHTML() {
   // Load all session files
   const sessionFiles = fs.readdirSync(dataPath).filter(f => f.endsWith('.json'));
-  const sessions = sessionFiles.map(f => {
-    const data = JSON.parse(fs.readFileSync(path.join(dataPath, f), 'utf-8'));
-    return data;
-  }).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const sessions = [];
+
+  for (const f of sessionFiles) {
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(dataPath, f), 'utf-8'));
+      sessions.push(data);
+    } catch (err) {
+      console.warn(`[Report Hub] Warning: Could not parse ${f}: ${err.message}`);
+    }
+  }
+
+  sessions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  // Escape project name for HTML
+  const safeProjectName = escapeHtml(projectName);
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${projectName}</title>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <title>${safeProjectName}</title>
+  <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -351,6 +417,7 @@ function generateHubHTML() {
     }
 
     .btn:hover { background: var(--bg-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn i { width: 14px; height: 14px; }
 
     .filter-tabs {
@@ -621,7 +688,7 @@ function generateHubHTML() {
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <h1><i data-lucide="layout-dashboard"></i> ${projectName}</h1>
+      <h1><i data-lucide="layout-dashboard"></i> ${safeProjectName}</h1>
       <div class="sidebar-stats">
         <span class="stat passed"><i data-lucide="check-circle"></i> <span id="total-passed">0</span> passed</span>
         <span class="stat failed"><i data-lucide="x-circle"></i> <span id="total-failed">0</span> failed</span>
@@ -645,7 +712,7 @@ function generateHubHTML() {
     <div class="main-header">
       <h2 id="current-session-name">Select a Session</h2>
       <div class="header-actions">
-        <button class="btn" onclick="exportReport()">
+        <button class="btn" id="export-btn" onclick="exportReport()" disabled>
           <i data-lucide="download"></i> Export
         </button>
         <button class="btn" onclick="refreshData()">
@@ -692,10 +759,24 @@ function generateHubHTML() {
 
   <script>
     // Session data embedded at build time
-    const sessions = ${JSON.stringify(sessions)};
+    const sessions = ${JSON.stringify(sessions.map(s => ({
+      ...s,
+      name: escapeHtml(s.name),
+      tests: s.tests.map(t => ({
+        ...t,
+        name: escapeHtml(t.name)
+      }))
+    })))};
 
     let currentSession = null;
     let currentFilter = 'all';
+
+    // Utility: Escape HTML for dynamic content
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
@@ -726,7 +807,7 @@ function generateHubHTML() {
       const container = document.getElementById('session-list');
       container.innerHTML = sessions.map(session => \`
         <div class="session-item \${currentSession?.id === session.id ? 'active' : ''}"
-             onclick="selectSession('\${session.id}')">
+             onclick="selectSession('\${escapeHtml(session.id)}')">
           <div class="session-item-header">
             <div class="session-name">\${session.name}</div>
             <div class="session-status \${session.summary.failed > 0 ? 'failed' : 'passed'}">
@@ -747,7 +828,8 @@ function generateHubHTML() {
       currentSession = sessions.find(s => s.id === id);
       renderSessions();
       renderTests();
-      document.getElementById('current-session-name').textContent = currentSession.name;
+      document.getElementById('current-session-name').textContent = currentSession ? currentSession.name : 'Select a Session';
+      document.getElementById('export-btn').disabled = !currentSession;
     }
 
     function renderTests() {
@@ -772,7 +854,7 @@ function generateHubHTML() {
       }
 
       container.innerHTML = tests.map(test => \`
-        <div class="test-item" onclick="showTestDetail('\${test.id}')">
+        <div class="test-item" onclick="showTestDetail('\${escapeHtml(test.id)}')">
           <div class="test-status-icon \${test.status}">
             <i data-lucide="\${test.status === 'passed' ? 'check' : 'x'}"></i>
           </div>
@@ -793,6 +875,7 @@ function generateHubHTML() {
     }
 
     function showTestDetail(testId) {
+      if (!currentSession) return;
       const test = currentSession.tests.find(t => t.id === testId);
       if (!test) return;
 
@@ -805,7 +888,7 @@ function generateHubHTML() {
           <div class="detail-section">
             <div class="detail-section-title">Video Recording</div>
             <div class="video-container">
-              <video controls src="assets/\${test.videos[0]}"></video>
+              <video controls src="assets/\${encodeURIComponent(test.videos[0])}"></video>
             </div>
           </div>
         \`;
@@ -816,8 +899,17 @@ function generateHubHTML() {
           <div class="detail-section">
             <div class="detail-section-title">Screenshots</div>
             <div class="screenshot-grid">
-              \${test.screenshots.map(s => \`<img src="assets/\${s}" onclick="openLightbox('assets/\${s}')">\`).join('')}
+              \${test.screenshots.map(s => \`<img src="assets/\${encodeURIComponent(s)}" onclick="openLightbox(event, 'assets/\${encodeURIComponent(s)}')">\`).join('')}
             </div>
+          </div>
+        \`;
+      }
+
+      if (test.logs.length > 0) {
+        content += \`
+          <div class="detail-section">
+            <div class="detail-section-title">Logs</div>
+            \${test.logs.map(l => \`<a href="assets/\${encodeURIComponent(l)}" target="_blank" class="asset-badge" style="margin-right: 8px; text-decoration: none;"><i data-lucide="file-text"></i> \${escapeHtml(l)}</a>\`).join('')}
           </div>
         \`;
       }
@@ -851,6 +943,11 @@ function generateHubHTML() {
       const container = document.getElementById('trend-chart');
       const recentSessions = sessions.slice(0, 10).reverse();
 
+      if (recentSessions.length === 0) {
+        container.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">No data yet</p>';
+        return;
+      }
+
       container.innerHTML = recentSessions.map(session => {
         const passRate = session.summary.total > 0
           ? (session.summary.passed / session.summary.total) * 100
@@ -871,11 +968,15 @@ function generateHubHTML() {
     }
 
     function formatDate(isoString) {
-      const date = new Date(isoString);
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      try {
+        const date = new Date(isoString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        return 'Unknown date';
+      }
     }
 
-    function openLightbox(src) {
+    function openLightbox(event, src) {
       event.stopPropagation();
       document.getElementById('lightbox-img').src = src;
       document.getElementById('lightbox').classList.add('open');
@@ -900,13 +1001,20 @@ function generateHubHTML() {
     }
 
     function exportReport() {
+      if (!currentSession) {
+        alert('Please select a session first');
+        return;
+      }
       const dataStr = JSON.stringify(currentSession, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = \`\${currentSession.name}-report.json\`;
+      a.download = \`\${currentSession.id}-report.json\`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function refreshData() {
@@ -927,8 +1035,13 @@ function generateHubHTML() {
 
 // Write hub index.html
 const hubIndexPath = path.join(hubPath, 'index.html');
-fs.writeFileSync(hubIndexPath, generateHubHTML());
 
-console.log(`[Report Hub] Hub generated: ${hubIndexPath}`);
-console.log(`[Report Hub] Total sessions: ${fs.readdirSync(dataPath).filter(f => f.endsWith('.json')).length}`);
-console.log(`[Report Hub] Open ${hubIndexPath} in your browser to view the report hub.`);
+try {
+  fs.writeFileSync(hubIndexPath, generateHubHTML());
+  console.log(`[Report Hub] Hub generated: ${hubIndexPath}`);
+  console.log(`[Report Hub] Total sessions: ${fs.readdirSync(dataPath).filter(f => f.endsWith('.json')).length}`);
+  console.log(`[Report Hub] Open ${hubIndexPath} in your browser to view the report hub.`);
+} catch (err) {
+  console.error(`[Report Hub] Error writing hub HTML: ${err.message}`);
+  process.exit(1);
+}
