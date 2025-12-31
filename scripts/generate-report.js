@@ -65,23 +65,55 @@ Icons:
 }
 
 /**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  const htmlEntities = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return String(str).replace(/[&<>"']/g, c => htmlEntities[c]);
+}
+
+/**
+ * Escape string for use in JavaScript string literals
+ */
+function escapeJs(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+}
+
+/**
  * Recursively find files with specific extensions
  */
 function findFiles(dir, extensions) {
   const results = [];
   if (!fs.existsSync(dir)) return results;
 
-  const files = fs.readdirSync(dir, { withFileTypes: true });
-  for (const file of files) {
-    const fullPath = path.join(dir, file.name);
-    if (file.isDirectory()) {
-      results.push(...findFiles(fullPath, extensions));
-    } else {
-      const ext = path.extname(file.name).toLowerCase();
-      if (extensions.includes(ext)) {
-        results.push(fullPath);
+  try {
+    const files = fs.readdirSync(dir, { withFileTypes: true });
+    for (const file of files) {
+      const fullPath = path.join(dir, file.name);
+      if (file.isDirectory()) {
+        results.push(...findFiles(fullPath, extensions));
+      } else {
+        const ext = path.extname(file.name).toLowerCase();
+        if (extensions.includes(ext)) {
+          results.push(fullPath);
+        }
       }
     }
+  } catch (err) {
+    console.warn(`Warning: Could not read directory ${dir}: ${err.message}`);
   }
   return results;
 }
@@ -115,7 +147,7 @@ function scanArtifacts(artifactsDir) {
         videos: [],
         screenshots: [],
         logs: [],
-        status: inferStatus(testName),
+        status: inferStatus(testName, filePath),
         duration: null
       });
     }
@@ -150,7 +182,7 @@ function scanArtifacts(artifactsDir) {
           test.steps = result.steps;
         }
       } catch (e) {
-        // Ignore parse errors
+        console.warn(`Warning: Could not parse ${jsonPath}: ${e.message}`);
       }
     }
   });
@@ -171,16 +203,35 @@ function formatTestName(name) {
 }
 
 /**
- * Infer test status from name
+ * Infer test status from name and file patterns
  */
-function inferStatus(name) {
+function inferStatus(name, filePath) {
   const lower = name.toLowerCase();
+  const fileName = filePath ? path.basename(filePath).toLowerCase() : '';
+
+  // Check for explicit pass/success indicators
   if (lower.includes('pass') || lower.includes('success')) {
     return 'passed';
   }
-  if (lower.includes('fail') || lower.includes('error')) {
+
+  // More specific failure detection patterns
+  if (fileName.startsWith('fail') ||
+      fileName.includes('.fail.') ||
+      fileName.includes('_fail_') ||
+      fileName.includes('-fail-') ||
+      fileName.endsWith('-failed.png') ||
+      fileName.endsWith('-error.png')) {
     return 'failed';
   }
+
+  // Check directory name for failure patterns
+  if (lower.startsWith('fail') ||
+      lower.includes('-fail-') ||
+      lower.includes('_fail_') ||
+      lower.endsWith('-failed')) {
+    return 'failed';
+  }
+
   return 'unknown';
 }
 
@@ -204,14 +255,17 @@ function generateHTML(tests, config) {
   const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
   const timestamp = new Date().toLocaleString();
 
+  // Escape project name for HTML
+  const safeProjectName = escapeHtml(config.projectName);
+
   const generateTestItem = (test, index) => `
-    <div class="test-item ${index === 0 ? 'active' : ''}" data-index="${index}" data-status="${test.status}" onclick="selectTest(${index})">
+    <div class="test-item ${index === 0 ? 'active' : ''}" data-index="${index}" data-status="${escapeHtml(test.status)}" onclick="selectTest(${index})">
       <div class="test-item-header">
-        <div class="test-status ${test.status}"></div>
-        <div class="test-name">${test.name}</div>
+        <div class="test-status ${escapeHtml(test.status)}"></div>
+        <div class="test-name">${escapeHtml(test.name)}</div>
       </div>
       <div class="test-meta">
-        ${test.duration ? `<span><i data-lucide="clock" class="icon-sm"></i> ${formatDuration(test.duration)}</span>` : ''}
+        ${test.duration ? `<span><i data-lucide="clock" class="icon-sm"></i> ${escapeHtml(formatDuration(test.duration))}</span>` : ''}
         ${test.videos.length > 0 ? `<span><i data-lucide="video" class="icon-sm"></i> ${test.videos.length}</span>` : ''}
         ${test.screenshots.length > 0 ? `<span><i data-lucide="camera" class="icon-sm"></i> ${test.screenshots.length}</span>` : ''}
       </div>
@@ -223,12 +277,12 @@ function generateHTML(tests, config) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${config.projectName} - Test Report</title>
+  <title>${safeProjectName} - Test Report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <!-- Lucide Icons - Open Source (MIT License) - https://lucide.dev -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
   <style>
     :root {
       --bg-primary: #f8fafc;
@@ -973,8 +1027,8 @@ function generateHTML(tests, config) {
             <i data-lucide="bird" class="icon-xl"></i>
           </div>
           <div class="logo-text">
-            <h1>${config.projectName}</h1>
-            <p><i data-lucide="calendar" class="icon-sm"></i> ${timestamp}</p>
+            <h1>${safeProjectName}</h1>
+            <p><i data-lucide="calendar" class="icon-sm"></i> ${escapeHtml(timestamp)}</p>
           </div>
         </div>
         <div class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode" role="button" tabindex="0">
@@ -1054,10 +1108,22 @@ function generateHTML(tests, config) {
   </div>
 
   <script>
-    const testsData = ${JSON.stringify(tests, (key, value) => {
-      if (key === 'path') return undefined;
-      return value;
-    }, 2)};
+    // Escape HTML utility
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    const testsData = ${JSON.stringify(tests.map(t => ({
+      ...t,
+      name: t.name,
+      error: t.error,
+      videos: t.videos.map(v => ({ name: v.name })),
+      screenshots: t.screenshots.map(s => ({ name: s.name })),
+      steps: t.steps
+    })), null, 2)};
 
     let currentTestIndex = 0;
 
@@ -1115,14 +1181,18 @@ function generateHTML(tests, config) {
         return '<div class="empty-state"><div class="empty-state-icon"><i data-lucide="search" style="width:64px;height:64px;"></i></div><h3>Select a Test</h3><p>Choose a test from the list</p></div>';
       }
 
+      const safeName = escapeHtml(test.name);
+      const safeStatus = escapeHtml(test.status);
+      const safeError = escapeHtml(test.error);
+
       let html = \`
         <div class="detail-header">
           <div class="detail-title">
-            <h2>\${test.name}</h2>
+            <h2>\${safeName}</h2>
             <div class="detail-badges">
-              <span class="badge \${test.status}">
+              <span class="badge \${safeStatus}">
                 <i data-lucide="\${test.status === 'passed' ? 'check-circle' : test.status === 'failed' ? 'x-circle' : 'alert-circle'}" class="icon-sm"></i>
-                \${test.status.toUpperCase()}
+                \${safeStatus.toUpperCase()}
               </span>
               \${test.duration ? \`<span class="badge duration"><i data-lucide="clock" class="icon-sm"></i> \${formatDuration(test.duration)}</span>\` : ''}
             </div>
@@ -1132,7 +1202,7 @@ function generateHTML(tests, config) {
         <div class="video-container">
           \${test.videos && test.videos.length > 0 ? \`
             <video controls autoplay loop muted playsinline>
-              <source src="\${test.videos[0].name}" type="video/mp4">
+              <source src="\${encodeURIComponent(test.videos[0].name)}" type="video/mp4">
               Video playback not supported
             </video>
           \` : \`
@@ -1148,7 +1218,7 @@ function generateHTML(tests, config) {
         html += \`
           <div class="error-section">
             <div class="error-title"><i data-lucide="alert-triangle" class="icon-md"></i> Error Details</div>
-            <div class="error-message">\${test.error}</div>
+            <div class="error-message">\${safeError}</div>
           </div>
         \`;
       }
@@ -1159,9 +1229,9 @@ function generateHTML(tests, config) {
             <div class="section-title"><i data-lucide="image" class="icon-md"></i> Screenshots (\${test.screenshots.length})</div>
             <div class="screenshots-grid">
               \${test.screenshots.map(s => \`
-                <div class="screenshot-item" onclick="openLightbox('\${s.name}')">
-                  <img src="\${s.name}" alt="\${s.name}" loading="lazy">
-                  <div class="screenshot-name">\${s.name}</div>
+                <div class="screenshot-item" onclick="openLightbox('\${encodeURIComponent(s.name)}')">
+                  <img src="\${encodeURIComponent(s.name)}" alt="\${escapeHtml(s.name)}" loading="lazy">
+                  <div class="screenshot-name">\${escapeHtml(s.name)}</div>
                 </div>
               \`).join('')}
             </div>
@@ -1175,9 +1245,9 @@ function generateHTML(tests, config) {
             <div class="section-title"><i data-lucide="list-checks" class="icon-md"></i> Test Steps</div>
             <div class="steps-timeline">
               \${test.steps.map(step => \`
-                <div class="step-item \${step.status || 'success'}">
-                  <div class="step-action">\${step.action}</div>
-                  \${step.detail ? \`<div class="step-detail">\${step.detail}</div>\` : ''}
+                <div class="step-item \${escapeHtml(step.status || 'success')}">
+                  <div class="step-action">\${escapeHtml(step.action)}</div>
+                  \${step.detail ? \`<div class="step-detail">\${escapeHtml(step.detail)}</div>\` : ''}
                 </div>
               \`).join('')}
             </div>
@@ -1190,7 +1260,7 @@ function generateHTML(tests, config) {
 
     function openLightbox(src) {
       const img = document.getElementById('lightboxImage');
-      img.src = src;
+      img.src = decodeURIComponent(src);
       document.getElementById('lightbox').classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -1235,16 +1305,20 @@ function generateHTML(tests, config) {
 function generateDetailPanel(test) {
   if (!test) return '';
 
+  const safeName = escapeHtml(test.name);
+  const safeStatus = escapeHtml(test.status);
+  const safeError = escapeHtml(test.error);
+
   let html = `
     <div class="detail-header">
       <div class="detail-title">
-        <h2>${test.name}</h2>
+        <h2>${safeName}</h2>
         <div class="detail-badges">
-          <span class="badge ${test.status}">
+          <span class="badge ${safeStatus}">
             <i data-lucide="${test.status === 'passed' ? 'check-circle' : test.status === 'failed' ? 'x-circle' : 'alert-circle'}" class="icon-sm"></i>
-            ${test.status.toUpperCase()}
+            ${safeStatus.toUpperCase()}
           </span>
-          ${test.duration ? `<span class="badge duration"><i data-lucide="clock" class="icon-sm"></i> ${formatDuration(test.duration)}</span>` : ''}
+          ${test.duration ? `<span class="badge duration"><i data-lucide="clock" class="icon-sm"></i> ${escapeHtml(formatDuration(test.duration))}</span>` : ''}
         </div>
       </div>
     </div>
@@ -1252,7 +1326,7 @@ function generateDetailPanel(test) {
     <div class="video-container">
       ${test.videos && test.videos.length > 0 ? `
         <video controls autoplay loop muted playsinline>
-          <source src="${path.basename(test.videos[0].path)}" type="video/mp4">
+          <source src="${encodeURIComponent(path.basename(test.videos[0].path))}" type="video/mp4">
           Video playback not supported
         </video>
       ` : `
@@ -1268,7 +1342,7 @@ function generateDetailPanel(test) {
     html += `
       <div class="error-section">
         <div class="error-title"><i data-lucide="alert-triangle" class="icon-md"></i> Error Details</div>
-        <div class="error-message">${test.error}</div>
+        <div class="error-message">${safeError}</div>
       </div>
     `;
   }
@@ -1279,9 +1353,9 @@ function generateDetailPanel(test) {
         <div class="section-title"><i data-lucide="image" class="icon-md"></i> Screenshots (${test.screenshots.length})</div>
         <div class="screenshots-grid">
           ${test.screenshots.map(s => `
-            <div class="screenshot-item" onclick="openLightbox('${path.basename(s.path)}')">
-              <img src="${path.basename(s.path)}" alt="${s.name}" loading="lazy">
-              <div class="screenshot-name">${s.name}</div>
+            <div class="screenshot-item" onclick="openLightbox('${encodeURIComponent(path.basename(s.path))}')">
+              <img src="${encodeURIComponent(path.basename(s.path))}" alt="${escapeHtml(s.name)}" loading="lazy">
+              <div class="screenshot-name">${escapeHtml(s.name)}</div>
             </div>
           `).join('')}
         </div>
@@ -1295,9 +1369,9 @@ function generateDetailPanel(test) {
         <div class="section-title"><i data-lucide="list-checks" class="icon-md"></i> Test Steps</div>
         <div class="steps-timeline">
           ${test.steps.map(step => `
-            <div class="step-item ${step.status || 'success'}">
-              <div class="step-action">${step.action}</div>
-              ${step.detail ? `<div class="step-detail">${step.detail}</div>` : ''}
+            <div class="step-item ${escapeHtml(step.status || 'success')}">
+              <div class="step-action">${escapeHtml(step.action)}</div>
+              ${step.detail ? `<div class="step-detail">${escapeHtml(step.detail)}</div>` : ''}
             </div>
           `).join('')}
         </div>
@@ -1321,30 +1395,35 @@ function main() {
   console.log(`Icons:      Lucide (https://lucide.dev) - MIT License`);
   console.log('');
 
-  const tests = scanArtifacts(CONFIG.artifactsDir);
-  const passed = tests.filter(t => t.status === 'passed').length;
-  const failed = tests.filter(t => t.status === 'failed').length;
+  try {
+    const tests = scanArtifacts(CONFIG.artifactsDir);
+    const passed = tests.filter(t => t.status === 'passed').length;
+    const failed = tests.filter(t => t.status === 'failed').length;
 
-  console.log(`Found ${tests.length} test(s)`);
-  console.log(`  Passed: ${passed}`);
-  console.log(`  Failed: ${failed}`);
-  console.log('');
+    console.log(`Found ${tests.length} test(s)`);
+    console.log(`  Passed: ${passed}`);
+    console.log(`  Failed: ${failed}`);
+    console.log('');
 
-  if (!fs.existsSync(CONFIG.outputDir)) {
-    fs.mkdirSync(CONFIG.outputDir, { recursive: true });
+    if (!fs.existsSync(CONFIG.outputDir)) {
+      fs.mkdirSync(CONFIG.outputDir, { recursive: true });
+    }
+
+    const html = generateHTML(tests, CONFIG);
+    const outputPath = path.join(CONFIG.outputDir, `${CONFIG.reportName}.html`);
+    fs.writeFileSync(outputPath, html);
+
+    console.log(`Report generated successfully!`);
+    console.log('');
+    console.log(`Open in browser:`);
+    console.log(`  file://${path.resolve(outputPath)}`);
+    console.log('');
+    console.log('Tip: Use --help for all options');
+    console.log('');
+  } catch (err) {
+    console.error(`Error generating report: ${err.message}`);
+    process.exit(1);
   }
-
-  const html = generateHTML(tests, CONFIG);
-  const outputPath = path.join(CONFIG.outputDir, `${CONFIG.reportName}.html`);
-  fs.writeFileSync(outputPath, html);
-
-  console.log(`Report generated successfully!`);
-  console.log('');
-  console.log(`Open in browser:`);
-  console.log(`  file://${path.resolve(outputPath)}`);
-  console.log('');
-  console.log('Tip: Use --help for all options');
-  console.log('');
 }
 
 main();
