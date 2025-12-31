@@ -2,11 +2,16 @@
 
 # Eagle Mobile E2E Testing
 
-### *The Ultimate Claude Code Skill for Mobile Testing Excellence*
+### *Universal Agent Skill for Mobile Testing Excellence*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-blue?style=for-the-badge)](/)
 [![Detox](https://img.shields.io/badge/Powered%20by-Detox-orange?style=for-the-badge)](https://wix.github.io/Detox/)
+
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Ready-blueviolet?style=flat-square)](https://claude.ai)
+[![OpenAI Codex](https://img.shields.io/badge/OpenAI%20Codex-Ready-green?style=flat-square)](https://openai.com/codex)
+[![Cursor](https://img.shields.io/badge/Cursor-Ready-blue?style=flat-square)](https://cursor.com)
+[![GitHub Copilot](https://img.shields.io/badge/Copilot-Ready-black?style=flat-square)](https://github.com/features/copilot)
 
 <br />
 
@@ -16,11 +21,11 @@
 
 <br />
 
-[Getting Started](#-quick-start) ·
-[Features](#-features) ·
-[Examples](#-examples) ·
-[Documentation](#-documentation) ·
-[Advanced Testing](#-advanced-capabilities)
+[Getting Started](#quick-start) ·
+[Features](#features) ·
+[Examples](#examples-library) ·
+[Documentation](#documentation) ·
+[Advanced Testing](#advanced-capabilities)
 
 ---
 
@@ -31,6 +36,7 @@
 | | Feature | Description |
 |:---:|---------|-------------|
 | ◉ | **Universal Platform Support** | Single skill for React Native, iOS native, and Android native apps |
+| ◉ | **Multi-Agent Compatible** | Works with Claude Code, Codex, Cursor, Copilot, and 20+ AI tools |
 | ◉ | **AI-Powered Testing** | Generate tests from natural language using Wix Pilot |
 | ◉ | **Rich Artifacts** | Video recordings, screenshots, logs, and timeline traces for every test |
 | ◉ | **Beautiful Reports** | Modern HTML reports with dark/light mode and video playback |
@@ -39,15 +45,28 @@
 
 ---
 
-## Important: How Claude Uses This Skill
+## Multi-Platform Compatibility
 
-When writing E2E tests, Claude follows these critical guidelines (defined in SKILL.md):
+Eagle follows two open standards, making it work across 25+ AI coding assistants:
+
+| Standard | File | Supported Tools |
+|----------|------|-----------------|
+| **[Agent Skills](https://agentskills.io)** | `SKILL.md` | Claude Code, OpenAI Codex, GitHub Copilot, VS Code |
+| **[AGENTS.md](https://agents.md)** | `AGENTS.md` | Cursor, Codex, Copilot, Windsurf, Aider, Jules, and 20+ more |
+
+Both files are included — use whichever your tool supports.
+
+---
+
+## Important: How AI Agents Use This Skill
+
+When writing E2E tests, AI agents follow these critical guidelines:
 
 | Guideline | Why It Matters |
 |-----------|----------------|
-| **UI Discovery First** | Before writing tests, Claude searches for existing testIDs and screens using targeted grep — never dumps entire files |
+| **UI Discovery First** | Before writing tests, search for existing testIDs using targeted grep — never dump entire files |
 | **Background Execution** | All builds (`detox build`) and test runs (`detox test`) execute in background to prevent terminal flooding |
-| **Selective Reading** | Claude reads only relevant code sections (first 60 lines, specific patterns) — not entire components |
+| **Selective Reading** | Read only relevant code sections (first 60 lines, specific patterns) — not entire components |
 | **Output Limiting** | All search results are limited with `head -N` to prevent terminal crashes |
 
 These practices ensure smooth, efficient test development without overwhelming your terminal.
@@ -56,46 +75,64 @@ These practices ensure smooth, efficient test development without overwhelming y
 
 ## Quick Start
 
-### Step 1 — Install the Skill
+Choose the installation method for your AI coding tool:
 
-Choose your preferred installation method:
+### Claude Code
 
-**Option A: Clone to skills directory (Recommended)**
 ```bash
-# Clone to Claude Code skills directory
-git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/mobile-e2e-testing
+# Option 1: Clone to skills directory (Recommended)
+git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/eagle-mobile-e2e-testing
 
-# Verify installation
-ls ~/.claude/skills/mobile-e2e-testing/SKILL.md
+# Option 2: One-liner
+mkdir -p ~/.claude/skills && git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/eagle-mobile-e2e-testing
 ```
 
-**Option B: Add via Claude Code settings**
-```bash
-# Open Claude Code settings
-claude config
+Restart Claude Code. Verify by asking: *"What mobile testing capabilities do you have?"*
 
-# Add to skills array in settings:
-# "skills": ["~/.claude/skills/mobile-e2e-testing"]
+### OpenAI Codex
+
+```bash
+# Option 1: Clone to skills directory
+git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.codex/skills/eagle-mobile-e2e-testing
+
+# Option 2: Use built-in installer
+# In Codex, type: $skill-installer
+# Then: Install from github.com/eagleisbatman/eagle-mobile-e2e-testing
 ```
 
-**Option C: One-liner installation**
+### Cursor
+
+Cursor reads `AGENTS.md` from your project root:
+
 ```bash
-mkdir -p ~/.claude/skills && git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/mobile-e2e-testing
+# Option 1: Copy AGENTS.md to your project
+curl -o AGENTS.md https://raw.githubusercontent.com/eagleisbatman/eagle-mobile-e2e-testing/main/AGENTS.md
+
+# Option 2: Clone entire repo for full examples
+git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git
+# Then open the folder in Cursor
 ```
 
-### Step 2 — Restart Claude Code
+### GitHub Copilot
 
-Close and reopen Claude Code. The skill loads automatically from `~/.claude/skills/`.
+```bash
+# Clone to your project's skills directory
+git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git .github/skills/eagle-mobile-e2e-testing
+```
 
-### Step 3 — Verify Installation
+### Other Tools (Windsurf, Aider, etc.)
 
-In Claude Code, you should see the skill available. You can verify by asking:
+Most AI coding tools read `AGENTS.md` from the project root:
 
-> *"What mobile testing capabilities do you have?"*
+```bash
+curl -o AGENTS.md https://raw.githubusercontent.com/eagleisbatman/eagle-mobile-e2e-testing/main/AGENTS.md
+```
 
-### Step 4 — Start Testing
+---
 
-Just ask Claude:
+## Start Testing
+
+Once installed, ask your AI assistant:
 
 > *"Help me set up Detox E2E testing for my React Native Expo app"*
 
@@ -343,7 +380,8 @@ The skill includes comprehensive example tests for various app types:
 
 | Document | Description |
 |----------|-------------|
-| [SKILL.md](SKILL.md) | Complete skill reference with all advanced capabilities |
+| [SKILL.md](SKILL.md) | Full skill reference (Claude Code, Codex, Copilot) |
+| [AGENTS.md](AGENTS.md) | Condensed reference (Cursor, Windsurf, Aider, 20+ tools) |
 | [detox-config.md](references/detox-config.md) | Detox configuration deep-dive |
 | [android-setup.md](references/android-setup.md) | Android native code patches |
 | [pilot-setup.md](references/pilot-setup.md) | AI-powered test generation setup |
@@ -355,7 +393,8 @@ The skill includes comprehensive example tests for various app types:
 
 ```
 eagle-mobile-e2e-testing/
-├── SKILL.md                      # Main skill definition (1800+ lines)
+├── SKILL.md                      # Agent Skills format (Claude Code, Codex, Copilot)
+├── AGENTS.md                     # AGENTS.md format (Cursor, Windsurf, Aider, 20+ tools)
 ├── README.md                     # This file
 ├── LICENSE                       # MIT License
 ├── references/
@@ -427,8 +466,9 @@ git push origin feature/amazing-feature
 | Detox Documentation | [wix.github.io/Detox](https://wix.github.io/Detox/) |
 | Wix Pilot (AI Testing) | [github.com/wix-incubator/pilot](https://github.com/wix-incubator/pilot) |
 | Detox GitHub | [github.com/wix/Detox](https://github.com/wix/Detox) |
+| Agent Skills Specification | [agentskills.io](https://agentskills.io/) |
+| AGENTS.md Standard | [agents.md](https://agents.md/) |
 | Lucide Icons | [lucide.dev](https://lucide.dev/) |
-| Firebase DebugView | [firebase.google.com/docs/analytics/debugview](https://firebase.google.com/docs/analytics/debugview) |
 
 ---
 

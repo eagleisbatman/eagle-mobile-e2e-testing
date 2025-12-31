@@ -1,6 +1,22 @@
 ---
 name: eagle-mobile-e2e-testing
-description: Comprehensive end-to-end mobile testing skill for React Native (Expo/CLI), Jetpack Compose, SwiftUI, UIKit, and XML-based Android/iOS apps. CRITICAL - Before writing tests, you MUST first discover the UI structure using targeted grep searches (NOT full file dumps). Run all builds and test suites in BACKGROUND to prevent terminal flooding. Use this skill for (1) Detox E2E setup, (2) Writing test cases after UI discovery, (3) AI test generation via Wix Pilot, (4) Video/screenshot recording, (5) HTML report generation, (6) Testing permissions/biometrics/deep-links/offline, (7) Network mocking, (8) Push notifications, (9) CI/CD pipelines.
+description: |
+  Production-grade E2E testing for React Native (Expo/CLI), iOS (SwiftUI/UIKit), and Android (Compose/XML) using Detox.
+  CRITICAL: Before writing tests, discover UI via grep (not file dumps). Run builds/tests in BACKGROUND.
+  Covers: Detox setup, test patterns, AI generation (Wix Pilot), video/screenshots, HTML reports,
+  permissions, biometrics, deep links, offline mode, network mocking, push notifications, CI/CD.
+license: MIT
+metadata:
+  author: Gautam Mandewalker
+  version: "1.0.0"
+  repository: https://github.com/eagleisbatman/eagle-mobile-e2e-testing
+  platforms:
+    - claude-code
+    - openai-codex
+    - github-copilot
+    - cursor
+    - windsurf
+    - aider
 ---
 
 # Eagle Mobile E2E Testing Skill
