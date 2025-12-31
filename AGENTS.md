@@ -53,6 +53,27 @@ See SKILL.md for detailed templates with all context options.
 
 ## Critical Rules
 
+### 0. Handle Missing testIDs First
+
+**Most codebases lack testIDs.** Before writing tests:
+
+1. Find elements WITHOUT testIDs:
+```bash
+grep -rn "onPress=\|<Button\|<TextInput" --include="*.tsx" src/ | grep -v "testID" | head -20
+```
+
+2. ADD testIDs to components before writing tests:
+```tsx
+// Add testID to each interactive element
+<TextInput testID="login-email-input" ... />
+<Button testID="login-submit-button" ... />
+```
+
+3. Naming convention: `{screen}-{element}-{type}`
+   - `login-email-input`, `login-submit-button`, `product-item-0`
+
+4. Fallback if you can't modify code: `by.text('Sign In')` or `by.label('...')`
+
 ### 1. UI Discovery Before Writing Tests
 
 **NEVER write tests without first discovering the UI structure.**

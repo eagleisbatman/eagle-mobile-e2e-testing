@@ -264,6 +264,161 @@ grep -rhn "testID=\"[^\"]*\"" --include="*.tsx" src/ | sed 's/.*testID="\([^"]*\
 
 ---
 
+## Handling Missing testIDs
+
+**Reality:** Most codebases have few or no testIDs. This is normal. Here's the workflow:
+
+### Step 1: Identify Components Without testIDs
+
+```bash
+# Find interactive elements WITHOUT testIDs
+grep -rn "onPress=\|onClick=\|<Button\|<TouchableOpacity\|<Pressable\|<TextInput" --include="*.tsx" src/ | grep -v "testID" | head -30
+
+# Find form inputs without testIDs
+grep -rn "<TextInput\|<Input" --include="*.tsx" src/ | grep -v "testID" | head -20
+```
+
+### Step 2: Add testIDs to Components
+
+**Before writing tests, ADD testIDs to the components you need to test.**
+
+#### React Native / Expo
+
+```tsx
+// BEFORE (no testID)
+<TextInput
+  placeholder="Email"
+  value={email}
+  onChangeText={setEmail}
+/>
+
+// AFTER (with testID)
+<TextInput
+  testID="login-email-input"
+  placeholder="Email"
+  value={email}
+  onChangeText={setEmail}
+/>
+```
+
+#### SwiftUI
+
+```swift
+// BEFORE
+TextField("Email", text: $email)
+
+// AFTER
+TextField("Email", text: $email)
+    .accessibilityIdentifier("login-email-input")
+```
+
+#### UIKit
+
+```swift
+// BEFORE
+let emailField = UITextField()
+
+// AFTER
+let emailField = UITextField()
+emailField.accessibilityIdentifier = "login-email-input"
+```
+
+#### Jetpack Compose
+
+```kotlin
+// BEFORE
+TextField(value = email, onValueChange = { email = it })
+
+// AFTER
+TextField(
+    value = email,
+    onValueChange = { email = it },
+    modifier = Modifier.testTag("login-email-input")
+)
+```
+
+#### Android XML
+
+```xml
+<!-- BEFORE -->
+<EditText
+    android:id="@+id/emailInput"
+    android:hint="Email" />
+
+<!-- AFTER -->
+<EditText
+    android:id="@+id/emailInput"
+    android:hint="Email"
+    android:contentDescription="login-email-input" />
+```
+
+### Step 3: testID Naming Convention
+
+Follow this pattern: `{screen}-{element}-{type}`
+
+| Element | testID Example |
+|---------|----------------|
+| Screen container | `login-screen` |
+| Email input | `login-email-input` |
+| Password input | `login-password-input` |
+| Submit button | `login-submit-button` |
+| Error message | `login-error-text` |
+| List item (index) | `product-item-0`, `product-item-1` |
+| Toggle/Switch | `settings-notifications-toggle` |
+
+### Step 4: Fallback Matchers (When testIDs Can't Be Added)
+
+If you cannot modify the source code, use alternative matchers:
+
+```typescript
+// By visible text (less stable, but works)
+element(by.text('Sign In'))
+element(by.text('Submit'))
+
+// By accessibility label
+element(by.label('Email input field'))
+
+// By type (platform-specific, least recommended)
+element(by.type('RCTTextInput'))  // React Native
+element(by.type('UITextField'))   // iOS native
+
+// Combine matchers for specificity
+element(by.text('Submit').withAncestor(by.id('login-form')))
+```
+
+### Workflow Summary
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. DISCOVER: Find screens and existing testIDs             │
+│  2. IDENTIFY: Find elements that need testIDs               │
+│  3. ADD: Add testIDs to components (modify source files)    │
+│  4. VERIFY: Run quick grep to confirm testIDs are present   │
+│  5. WRITE: Now write the E2E tests                          │
+│  6. RUN: Execute tests in background                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Prompt Users for Missing testIDs
+
+When testIDs are missing, inform the user:
+
+```
+I found that [LoginScreen.tsx] has interactive elements without testIDs:
+- Email TextInput (line 45)
+- Password TextInput (line 52)
+- Login Button (line 60)
+
+I'll add the following testIDs:
+- login-email-input
+- login-password-input
+- login-submit-button
+
+[Proceed to edit the file and add testIDs]
+```
+
+---
+
 ## CRITICAL: Background Execution Guidelines
 
 **IMPORTANT:** Long-running commands MUST run in background to prevent terminal flooding and crashes.
