@@ -1,100 +1,87 @@
-# Eagle Mobile E2E Testing
+<div align="center">
 
-A state-of-the-art Claude Code skill for comprehensive end-to-end mobile testing using [Detox](https://wix.github.io/Detox/) with AI-powered test generation via [Wix Pilot](https://github.com/wix-incubator/pilot).
+# 🦅 Eagle Mobile E2E Testing
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey)
-![React Native](https://img.shields.io/badge/React%20Native-Expo%20%7C%20CLI-61DAFB)
-![Swift](https://img.shields.io/badge/iOS-SwiftUI%20%7C%20UIKit-FA7343)
-![Kotlin](https://img.shields.io/badge/Android-Compose%20%7C%20XML-7F52FF)
+### *The Ultimate Claude Code Skill for Mobile Testing Excellence*
 
----
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-blue?style=for-the-badge)](/)
+[![Detox](https://img.shields.io/badge/Powered%20by-Detox-orange?style=for-the-badge)](https://wix.github.io/Detox/)
 
-## Overview
+<br />
 
-This skill enables automated end-to-end testing for mobile applications across multiple platforms and frameworks. It provides:
+**Production-grade E2E testing for mobile apps with AI-powered test generation**
 
-- **Comprehensive Platform Support** - React Native (Expo/CLI), iOS (SwiftUI/UIKit), Android (Jetpack Compose/XML)
-- **AI-Powered Testing** - Generate tests using natural language via Wix Pilot
-- **Rich Artifacts** - Video recordings, screenshots, logs, and timeline traces
-- **Professional Reports** - HTML reports with embedded media
-- **CI/CD Ready** - Pre-built workflows for GitHub Actions, CircleCI, and Bitrise
-- **Best Practices** - Enforced naming conventions for discoverable, maintainable tests
-- **Advanced Capabilities** - Permissions, biometrics, deep links, offline mode, network mocking
+*React Native (Expo/CLI) • SwiftUI • UIKit • Jetpack Compose • XML Views*
 
----
+<br />
 
-## Platform Support
-
-| Platform | Framework | Support Level | testID Method |
-|----------|-----------|---------------|---------------|
-| React Native | Expo | Full | `testID="id"` |
-| React Native | CLI | Full | `testID="id"` |
-| iOS | SwiftUI | Full | `.accessibilityIdentifier("id")` |
-| iOS | UIKit | Full | `accessibilityIdentifier = "id"` |
-| Android | Jetpack Compose | Full | `Modifier.testTag("id")` |
-| Android | XML Views | Full | `android:contentDescription="id"` |
+[Getting Started](#-quick-start) •
+[Features](#-features) •
+[Examples](#-examples) •
+[Documentation](#-documentation) •
+[Advanced Testing](#-advanced-capabilities)
 
 ---
 
-## Quick Start
+</div>
 
-### 1. Install as Claude Code Skill
+## ✨ What Makes Eagle Special?
+
+| | Feature | Description |
+|:---:|---------|-------------|
+| 🎯 | **Universal Platform Support** | Single skill for React Native, iOS native, and Android native apps |
+| 🤖 | **AI-Powered Testing** | Generate tests from natural language using Wix Pilot |
+| 🎬 | **Rich Artifacts** | Video recordings, screenshots, logs, and timeline traces for every test |
+| 📊 | **Beautiful Reports** | Modern HTML reports with dark/light mode and video playback |
+| 🔐 | **Advanced Scenarios** | Biometrics, deep links, permissions, offline mode, network mocking |
+| 🔄 | **CI/CD Ready** | Pre-configured workflows for GitHub Actions, CircleCI, and Bitrise |
+
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ Install the Skill
 
 ```bash
-# Clone to your Claude skills directory
+# Clone to your Claude Code skills directory
 git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git ~/.claude/skills/eagle-mobile-e2e-testing
 ```
 
-### 2. Restart Claude Code
+### 2️⃣ Restart Claude Code
 
-The skill will automatically load and be available in your conversations.
+The skill loads automatically and becomes available in your conversations.
 
-### 3. Use the Skill
+### 3️⃣ Start Testing!
 
-Simply ask Claude Code to help with E2E testing:
+Just ask Claude:
 
-```
-"Help me set up Detox E2E testing for my React Native Expo app"
-"Write E2E tests for my login flow"
-"Add testIDs to my SwiftUI views"
-"Test push notifications in my app"
-"Set up network mocking for offline mode testing"
-```
+> *"Help me set up Detox E2E testing for my React Native Expo app"*
+
+> *"Write E2E tests for my checkout flow"*
+
+> *"Test biometric authentication in my iOS app"*
 
 ---
 
-## What's Included
+## 🎯 Platform Support Matrix
 
-```
-eagle-mobile-e2e-testing/
-├── SKILL.md                      # Main skill definition
-├── README.md                     # This file
-├── LICENSE                       # MIT License
-├── references/
-│   ├── detox-config.md          # Complete .detoxrc.js configuration
-│   ├── android-setup.md         # Android native code patches
-│   ├── pilot-setup.md           # AI-powered testing setup
-│   └── ci-workflows.md          # CI/CD configurations
-├── scripts/
-│   ├── run-e2e.sh               # Automated test runner
-│   └── generate-report.js       # HTML report generator
-├── examples/
-│   ├── login-flow.test.ts       # Authentication tests
-│   ├── permissions.test.ts      # Permission testing
-│   └── advanced-features.test.ts # Deep links, biometrics, etc.
-└── .github/
-    └── workflows/
-        └── e2e-tests.yml        # GitHub Actions workflow
-```
+| Platform | Framework | Support | testID Method |
+|:--------:|:---------:|:-------:|---------------|
+| 📱 React Native | Expo | ✅ Full | `testID="id"` |
+| 📱 React Native | CLI | ✅ Full | `testID="id"` |
+| 🍎 iOS | SwiftUI | ✅ Full | `.accessibilityIdentifier("id")` |
+| 🍎 iOS | UIKit | ✅ Full | `accessibilityIdentifier = "id"` |
+| 🤖 Android | Compose | ✅ Full | `Modifier.testTag("id")` |
+| 🤖 Android | XML | ✅ Full | `android:contentDescription="id"` |
 
 ---
 
-## Key Features
+## 🏆 Features
 
-### Enforced Naming Conventions
+### 📝 Enforced Best Practices
 
-The skill enforces consistent naming for tests that are discoverable and meaningful in reports:
+Tests that are readable, maintainable, and produce meaningful reports:
 
 ```typescript
 // File: e2e/flows/auth/login-flow.test.ts
@@ -102,12 +89,12 @@ The skill enforces consistent naming for tests that are discoverable and meaning
 describe('User Authentication - Login Flow', () => {
   it('should display welcome screen with login and register options', async () => {});
   it('should navigate to login screen when tapping Sign In', async () => {});
-  it('should show error banner when credentials are incorrect', async () => {});
+  it('should show validation error for invalid email format', async () => {});
   it('should navigate to home screen after successful authentication', async () => {});
 });
 ```
 
-### testID Standards
+### 🏷️ Standardized testID Patterns
 
 ```typescript
 // Pattern: {screen}-{element}-{type}
@@ -115,140 +102,220 @@ testID="login-screen"              // Screen container
 testID="login-email-input"         // Input field
 testID="login-submit-button"       // Button
 testID="login-error-banner"        // Error display
-testID="user-row-0"                // List item (indexed)
+testID="product-row-0"             // Indexed list items
 ```
 
-### Advanced Testing Capabilities
+### 📊 Stunning HTML Reports
 
-```typescript
-// Device Permissions (iOS)
-await device.launchApp({
-  permissions: { camera: 'YES', location: 'always' }
-});
+The included report generator creates beautiful, interactive reports with:
 
-// Biometric Authentication
-await device.setBiometricEnrollment(true);
-await device.matchFace();
-
-// Deep Linking
-await device.launchApp({ url: 'myapp://profile/123' });
-
-// Push Notifications
-await device.sendUserNotification({
-  trigger: { type: 'push' },
-  title: 'New Message',
-  payload: { messageId: '12345' }
-});
-
-// Background/Foreground
-await device.sendToHome();
-await device.launchApp({ newInstance: false });
-
-// Location Mocking
-await device.setLocation(37.7749, -122.4194);
-
-// Network Blacklisting
-await device.setURLBlacklist(['.*analytics.*']);
-```
-
-### Report Output
-
-```
-═══════════════════════════════════════════════════════════════
-                    E2E TEST REPORT
-═══════════════════════════════════════════════════════════════
-
-✅ PASSED: User Authentication - Login Flow (4 tests, 12.3s)
-   ✓ should display welcome screen with login and register options (2.3s)
-   ✓ should navigate to login screen when tapping Sign In (1.8s)
-   ✓ should show error banner when credentials are incorrect (3.2s)
-   ✓ should navigate to home screen after successful authentication (5.0s)
-
-═══════════════════════════════════════════════════════════════
-SUMMARY: 4 passed, 0 failed | Duration: 12.3s
-═══════════════════════════════════════════════════════════════
-```
-
----
-
-## Usage Examples
-
-### Setting Up a New Project
-
-Ask Claude:
-```
-Set up Detox E2E testing for my React Native Expo project
-```
-
-Claude will:
-1. Install required dependencies
-2. Configure `.detoxrc.js`
-3. Set up Jest configuration
-4. Create initial test structure
-5. Add npm scripts
-
-### Writing Tests
-
-Ask Claude:
-```
-Write E2E tests for my user registration flow. The screens are:
-1. Welcome screen with "Get Started" button
-2. Email/password form
-3. Profile setup
-4. Home screen
-```
-
-Claude will generate properly named, comprehensive tests.
-
-### Adding testIDs
-
-Ask Claude:
-```
-Add testIDs to my LoginScreen component (React Native)
-```
-
-Or for native:
-```
-Add accessibility identifiers to my SwiftUI LoginView
-```
-
-### Testing Advanced Features
-
-Ask Claude:
-```
-Write tests for biometric authentication in my app
-Test deep linking to the product detail screen
-Set up offline mode testing with network mocking
-```
-
-### Running Tests
+- 🌓 **Dark/Light mode toggle** with system preference detection
+- 📺 **Two-column layout** - Video playback alongside test details
+- 🖼️ **Screenshot gallery** with lightbox viewer
+- ⏱️ **Timeline visualization** of test steps
+- 🔍 **Filtering** by passed/failed status
+- ⌨️ **Keyboard navigation** (↑↓ arrows, j/k keys)
 
 ```bash
-# Run all tests with video recording
-./scripts/run-e2e.sh ios debug --videos
-
-# Run specific test file
-npx detox test e2e/flows/auth/login-flow.test.ts --configuration ios.sim.debug
-
-# Generate HTML report
-node scripts/generate-report.js e2e/artifacts e2e/reports/report.html
+# Generate a report
+node scripts/generate-report.js --artifacts ./artifacts --output ./reports --project "My App"
 ```
 
 ---
 
-## Documentation
+## 🛠️ Advanced Capabilities
+
+<details>
+<summary><b>🔐 Device Permissions</b></summary>
+
+```typescript
+// iOS - Full permission control
+await device.launchApp({
+  permissions: {
+    camera: 'YES',
+    photos: 'YES',
+    location: 'always',
+    notifications: 'YES',
+    microphone: 'YES'
+  }
+});
+
+// Android - ADB commands for permissions
+await device.launchApp({
+  launchArgs: {
+    'GRANT_CAMERA': 'true'
+  }
+});
+```
+</details>
+
+<details>
+<summary><b>👆 Biometric Authentication</b></summary>
+
+```typescript
+// Enable biometrics
+await device.setBiometricEnrollment(true);
+
+// Simulate Face ID success
+await device.matchFace();
+
+// Simulate Touch ID success
+await device.matchFinger();
+
+// Simulate failure
+await device.unmatchFace();
+```
+</details>
+
+<details>
+<summary><b>🔗 Deep Linking</b></summary>
+
+```typescript
+// Launch with deep link
+await device.launchApp({
+  url: 'myapp://products/12345'
+});
+
+// Open URL while app is running
+await device.openURL({
+  url: 'myapp://checkout?promo=SAVE20'
+});
+```
+</details>
+
+<details>
+<summary><b>📲 Push Notifications</b></summary>
+
+```typescript
+await device.sendUserNotification({
+  trigger: { type: 'push' },
+  title: 'New Message!',
+  body: 'You have a new message from John',
+  payload: {
+    messageId: '12345',
+    senderId: 'john-doe'
+  }
+});
+```
+</details>
+
+<details>
+<summary><b>🌐 Network Mocking & Offline Mode</b></summary>
+
+```typescript
+// Block analytics/tracking URLs
+await device.setURLBlacklist([
+  '.*analytics.*',
+  '.*tracking.*'
+]);
+
+// Disable network entirely
+await device.disableSynchronization();
+await device.setURLBlacklist(['.*']);
+
+// Re-enable
+await device.enableSynchronization();
+await device.setURLBlacklist([]);
+```
+</details>
+
+<details>
+<summary><b>📍 Location Mocking</b></summary>
+
+```typescript
+// San Francisco
+await device.setLocation(37.7749, -122.4194);
+
+// Tokyo
+await device.setLocation(35.6762, 139.6503);
+
+// Moving location (GPS simulation)
+await device.setLocation(37.7749, -122.4194);
+await new Promise(r => setTimeout(r, 2000));
+await device.setLocation(37.7751, -122.4180);
+```
+</details>
+
+<details>
+<summary><b>🔄 Background/Foreground</b></summary>
+
+```typescript
+// Send app to background
+await device.sendToHome();
+
+// Wait for some time
+await new Promise(r => setTimeout(r, 5000));
+
+// Bring app back to foreground
+await device.launchApp({ newInstance: false });
+
+// Verify app state restored correctly
+await expect(element(by.id('home-screen'))).toBeVisible();
+```
+</details>
+
+---
+
+## 📁 Examples Library
+
+The skill includes comprehensive example tests for various app types:
+
+| Example | Description | Key Patterns |
+|---------|-------------|--------------|
+| **E-Commerce** | Shopping cart, checkout, payments | Product browsing, cart management, order flow |
+| **Social Media** | Feeds, posts, stories, profiles | Infinite scroll, media upload, interactions |
+| **Messaging** | Chat, group chats, media sharing | Real-time updates, voice messages, video calls |
+| **Onboarding** | Welcome flows, tutorials, permissions | Carousels, progress indicators, skip functionality |
+| **Gaming** | Menus, purchases, leaderboards | In-app purchases, achievements, multiplayer |
+| **Login/Auth** | Email, social login, biometrics | Form validation, error handling, session management |
+| **Permissions** | Camera, location, notifications | Permission requests, fallback flows |
+
+---
+
+## 📖 Documentation
 
 | Document | Description |
 |----------|-------------|
-| [SKILL.md](SKILL.md) | Complete skill reference with advanced capabilities |
-| [detox-config.md](references/detox-config.md) | Detox configuration guide |
-| [android-setup.md](references/android-setup.md) | Android native setup |
-| [pilot-setup.md](references/pilot-setup.md) | AI-powered testing |
-| [ci-workflows.md](references/ci-workflows.md) | CI/CD configurations |
+| [📘 SKILL.md](SKILL.md) | Complete skill reference with all advanced capabilities |
+| [⚙️ detox-config.md](references/detox-config.md) | Detox configuration deep-dive |
+| [🤖 android-setup.md](references/android-setup.md) | Android native code patches |
+| [🧠 pilot-setup.md](references/pilot-setup.md) | AI-powered test generation setup |
+| [🔄 ci-workflows.md](references/ci-workflows.md) | CI/CD workflow configurations |
 
 ---
 
-## Requirements
+## 📂 Project Structure
+
+```
+eagle-mobile-e2e-testing/
+├── 📘 SKILL.md                      # Main skill definition (1600+ lines!)
+├── 📖 README.md                     # You are here
+├── 📄 LICENSE                       # MIT License
+├── 📁 references/
+│   ├── detox-config.md              # Complete .detoxrc.js guide
+│   ├── android-setup.md             # Android native patches
+│   ├── pilot-setup.md               # Wix Pilot AI testing
+│   └── ci-workflows.md              # CI/CD configurations
+├── 📁 scripts/
+│   ├── run-e2e.sh                   # Automated test runner
+│   └── generate-report.js           # Beautiful HTML report generator
+├── 📁 examples/
+│   ├── login-flow.test.ts           # Authentication tests
+│   ├── permissions.test.ts          # Permission testing
+│   ├── advanced-features.test.ts    # Deep links, biometrics
+│   ├── e-commerce.test.ts           # Shopping app patterns
+│   ├── social-media.test.ts         # Social networking patterns
+│   ├── messaging-chat.test.ts       # Chat app patterns
+│   ├── onboarding-tutorial.test.ts  # Onboarding flows
+│   └── gaming-entertainment.test.ts # Gaming & media patterns
+└── 📁 .github/
+    └── workflows/
+        └── e2e-tests.yml            # GitHub Actions workflow
+```
+
+---
+
+## 💻 System Requirements
 
 ### macOS (for iOS testing)
 - Xcode 14+ with Command Line Tools
@@ -262,41 +329,55 @@ node scripts/generate-report.js e2e/artifacts e2e/reports/report.html
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+Contributions are welcome! Whether it's:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- 🐛 Bug reports
+- 💡 Feature suggestions
+- 📝 Documentation improvements
+- 🔧 Code contributions
 
----
+Please feel free to open an issue or submit a PR.
 
-## License
+```bash
+# Fork, clone, create branch
+git checkout -b feature/amazing-feature
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# Make changes, commit
+git commit -m 'Add amazing feature'
 
----
-
-## Acknowledgments
-
-- [Wix Detox](https://wix.github.io/Detox/) - The E2E testing framework
-- [Wix Pilot](https://github.com/wix-incubator/pilot) - AI-powered testing
-- [Detox Instruments](https://github.com/wix-incubator/DetoxInstruments) - Performance profiling
-- [Claude Code](https://claude.ai/claude-code) - The AI assistant this skill is built for
+# Push and open PR
+git push origin feature/amazing-feature
+```
 
 ---
 
-## Resources
+## 📚 Resources
 
-- [Detox Documentation](https://wix.github.io/Detox/)
-- [Handling Runtime Permissions in Detox](https://brainsandbeards.com/blog/handling-runtime-application-permissions-in-detox/)
-- [Mocking Network Requests in Detox](https://brainsandbeards.com/blog/mocking-network-requests-in-detox-e2e-tests/)
-- [Firebase DebugView](https://firebase.google.com/docs/analytics/debugview)
-- [Detox GitHub Issues](https://github.com/wix/Detox/issues)
+| Resource | Link |
+|----------|------|
+| Detox Documentation | [wix.github.io/Detox](https://wix.github.io/Detox/) |
+| Wix Pilot (AI Testing) | [github.com/wix-incubator/pilot](https://github.com/wix-incubator/pilot) |
+| Detox GitHub | [github.com/wix/Detox](https://github.com/wix/Detox) |
+| Firebase DebugView | [firebase.google.com/docs/analytics/debugview](https://firebase.google.com/docs/analytics/debugview) |
 
 ---
 
-Made with care for the mobile testing community.
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+### Made with ❤️ by [Gautam Mandewalker](https://www.linkedin.com/in/gautammandewalker)
+
+*For the mobile testing community*
+
+<br />
+
+**[⬆ Back to Top](#-eagle-mobile-e2e-testing)**
+
+</div>
