@@ -30,24 +30,24 @@ A comprehensive, production-ready framework for end-to-end mobile testing using 
 e2e/
 ├── flows/                          # Feature-based organization
 │   ├── auth/
-│   │   ├── login-flow.test.ts           ✅ Descriptive: "login-flow"
-│   │   ├── registration-flow.test.ts    ✅ Descriptive: "registration-flow"
-│   │   ├── password-reset.test.ts       ✅ Descriptive: "password-reset"
-│   │   ├── biometric-auth.test.ts       ✅ Descriptive: "biometric-auth"
-│   │   └── test1.test.ts                ❌ NEVER: Generic names
+│   │   ├── login-flow.test.ts           [OK] Descriptive: "login-flow"
+│   │   ├── registration-flow.test.ts    [OK] Descriptive: "registration-flow"
+│   │   ├── password-reset.test.ts       [OK] Descriptive: "password-reset"
+│   │   ├── biometric-auth.test.ts       [OK] Descriptive: "biometric-auth"
+│   │   └── test1.test.ts                [NO] NEVER: Generic names
 │   ├── onboarding/
-│   │   ├── welcome-carousel.test.ts     ✅ Good
-│   │   └── permissions-request.test.ts  ✅ Good
+│   │   ├── welcome-carousel.test.ts     [OK] Good
+│   │   └── permissions-request.test.ts  [OK] Good
 │   ├── profile/
-│   │   ├── profile-view.test.ts         ✅ Good
-│   │   ├── profile-edit.test.ts         ✅ Good
-│   │   └── avatar-upload.test.ts        ✅ Good
+│   │   ├── profile-view.test.ts         [OK] Good
+│   │   ├── profile-edit.test.ts         [OK] Good
+│   │   └── avatar-upload.test.ts        [OK] Good
 │   ├── settings/
-│   │   ├── notification-prefs.test.ts   ✅ Good
-│   │   └── theme-switching.test.ts      ✅ Good
+│   │   ├── notification-prefs.test.ts   [OK] Good
+│   │   └── theme-switching.test.ts      [OK] Good
 │   └── search/
-│       ├── search-flow.test.ts          ✅ Good
-│       └── filter-results.test.ts       ✅ Good
+│       ├── search-flow.test.ts          [OK] Good
+│       └── filter-results.test.ts       [OK] Good
 ├── smoke/                          # Quick sanity checks
 │   └── critical-path.test.ts
 ├── regression/                     # Full regression suite
@@ -68,7 +68,7 @@ e2e/
 ```typescript
 // PATTERN: {screen}-{element}-{type}
 
-// ✅ GOOD testID patterns
+// GOOD testID patterns:
 testID="login-screen"                    // Screen identifier
 testID="login-email-input"               // Input field
 testID="login-password-input"            // Input field
@@ -95,7 +95,7 @@ testID="nav-settings-tab"                // Tab bar item
 testID="header-back-button"              // Navigation button
 testID="header-menu-button"              // Header action
 
-// ❌ BAD testID patterns
+// BAD testID patterns (avoid):
 testID="btn1"                            // Not descriptive
 testID="input"                           // Too generic
 testID="test"                            // Meaningless
@@ -105,7 +105,7 @@ testID="asdf"                            // Random characters
 ### 3. Test Suite & Case Naming
 
 ```typescript
-// ✅ CORRECT: Names that are meaningful in reports
+// CORRECT: Names that are meaningful in reports
 describe('User Authentication - Login Flow', () => {
   it('should display welcome screen with login and register options', async () => {});
   it('should navigate to login screen when tapping Sign In', async () => {});
@@ -122,7 +122,7 @@ describe('User Profile - Edit Profile', () => {
   it('should save changes successfully', async () => {});
 });
 
-// ❌ WRONG: Useless in reports
+// WRONG: Useless in reports (avoid)
 describe('Tests', () => {
   it('test 1', async () => {});           // What is this testing?
   it('test 2', async () => {});           // Impossible to debug
@@ -145,19 +145,19 @@ describe('Tests', () => {
                     Generated: 2025-01-15 14:32:00
 ═══════════════════════════════════════════════════════════════
 
-✅ PASSED: User Authentication - Login Flow (4 tests, 12.3s)
-   ✓ should display welcome screen with login and register options (2.3s)
-   ✓ should navigate to login screen when tapping Sign In (1.8s)
-   ✓ should show inline validation error for invalid email format (1.2s)
-   ✓ should navigate to home screen after successful authentication (7.0s)
+[PASS] User Authentication - Login Flow (4 tests, 12.3s)
+   [+] should display welcome screen with login and register options (2.3s)
+   [+] should navigate to login screen when tapping Sign In (1.8s)
+   [+] should show inline validation error for invalid email format (1.2s)
+   [+] should navigate to home screen after successful authentication (7.0s)
 
-✅ PASSED: User Profile - Edit Profile (3 tests, 8.1s)
-   ✓ should display current profile information (2.1s)
-   ✓ should allow editing display name (1.5s)
-   ✓ should save changes successfully (4.5s)
+[PASS] User Profile - Edit Profile (3 tests, 8.1s)
+   [+] should display current profile information (2.1s)
+   [+] should allow editing display name (1.5s)
+   [+] should save changes successfully (4.5s)
 
-❌ FAILED: Search - Filter Results (1 test failed)
-   ✗ should display filtered results matching criteria (3.2s)
+[FAIL] Search - Filter Results (1 test failed)
+   [-] should display filtered results matching criteria (3.2s)
 
      Error: Element not found
      Matcher: by.id("search-results-list")
