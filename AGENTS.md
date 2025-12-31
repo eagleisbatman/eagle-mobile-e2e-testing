@@ -1,392 +1,144 @@
 # Eagle Mobile E2E Testing
 
-> **For AI Coding Agents** | Human docs: [README.md](README.md) | Full reference: [SKILL.md](SKILL.md)
+> **For AI Coding Agents** | Human docs: [README.md](README.md)
 
-Production-grade E2E testing skill for mobile apps using **Detox**. Supports React Native (Expo/CLI), iOS native (SwiftUI/UIKit), and Android native (Jetpack Compose/XML).
+Production-grade end-to-end mobile testing skill using **Detox**. Covers the complete workflow: setup, configuration, test writing, execution, and HTML report generation.
 
 **Author:** [Gautam Mandewalker](https://www.linkedin.com/in/gautammandewalker) | **License:** MIT
 
 ---
 
-**Contents:** [Prompt Template](#prompt-template) | [Critical Rules](#critical-rules) | [testID Conventions](#testid-conventions) | [Build & Test](#build--test-commands) | [Test Patterns](#common-test-patterns) | [Setup](#setup-requirements)
+## How to Use This Skill
+
+### Scenario A: You Cloned This Repo
+
+If you cloned this repo directly, **read the full skill file**:
+
+```
+→ Read: SKILL.md (in this directory)
+```
+
+SKILL.md contains:
+- Complete Detox setup instructions
+- testID conventions for all platforms
+- Handling missing testIDs (adding them to components)
+- Test patterns and examples
+- Background execution guidelines
+- HTML report generation
+- CI/CD workflows
+- 28 example test files
+
+### Scenario B: Adding to Existing AGENTS.md
+
+If you already have an `AGENTS.md` in your project, add this section:
+
+```markdown
+## Mobile E2E Testing (Detox)
+
+For comprehensive mobile E2E testing, this project uses the Eagle Mobile E2E Testing skill.
+
+Skill location: [.skills/mobile-e2e/SKILL.md] or [path/to/eagle-mobile-e2e-testing/SKILL.md]
+
+When asked to write E2E tests, set up Detox, or generate test reports:
+1. Read the SKILL.md file at the path above
+2. Follow the guidelines for UI discovery, testID handling, and background execution
+3. Use the test patterns and examples provided
+
+Installation:
+git clone https://github.com/eagleisbatman/eagle-mobile-e2e-testing.git .skills/mobile-e2e
+```
 
 ---
 
-## Prompt Template
+## End-to-End Prompt Template
 
-**Users should provide this context when requesting E2E tests:**
-
-```
-Write E2E tests for [FEATURE] in my mobile app.
-
-**Stack:** [React Native Expo / CLI / SwiftUI / Compose]
-**Screens folder:** [src/screens/ or src/features/*/]
-**Navigation:** [React Navigation / Expo Router / Native]
-**Screen file:** [src/screens/LoginScreen.tsx]
-
-**Flow to test:**
-1. User [action] → sees [result]
-2. User [action] → sees [result]
-
-**Known testIDs:** [list or "discover them"]
-**Special:** [biometrics / deep links / offline / none]
-```
-
-**Quick Examples:**
+When users request E2E testing, they should provide this context for the **complete workflow**:
 
 ```
-# Setup
-"Set up Detox for my React Native Expo app. Screens are in src/features/*/screens/"
+Set up and run complete E2E testing for my mobile app.
 
-# Feature Test
-"Write tests for login flow in src/features/auth/screens/LoginScreen.tsx.
-Test: valid login, invalid email error, forgot password navigation."
+PROJECT CONTEXT:
+- App name: [MyApp]
+- Framework: [React Native Expo / CLI / SwiftUI / UIKit / Jetpack Compose]
+- Language: [TypeScript / JavaScript / Swift / Kotlin]
+- Project root: [/path/to/project]
+- Screens folder: [src/screens/ or src/features/*/screens/]
+- Navigation: [React Navigation / Expo Router / Native]
 
-# Full Suite
-"Create E2E test suite for my e-commerce app. Cover: auth, product browse, cart, checkout.
-Screens in src/screens/, using React Navigation v6 with bottom tabs."
+WHAT I NEED:
+1. [ ] Set up Detox from scratch (install, configure .detoxrc.js)
+2. [ ] Discover existing UI structure and testIDs
+3. [ ] Add missing testIDs to components
+4. [ ] Write E2E tests for: [list features/flows]
+5. [ ] Run tests on: [iOS Simulator / Android Emulator / Both]
+6. [ ] Generate HTML report with videos and screenshots
+
+FEATURES TO TEST:
+- [Feature 1]: User flow description
+- [Feature 2]: User flow description
+- [Feature 3]: User flow description
+
+TARGET DEVICES:
+- iOS: [iPhone 15 / iPhone 14 Pro]
+- Android: [Pixel 4 API 33 / etc.]
+
+SPECIAL REQUIREMENTS:
+- [ ] Biometric authentication
+- [ ] Deep links
+- [ ] Offline mode
+- [ ] Network mocking
+- [ ] CI/CD setup for [GitHub Actions / CircleCI]
 ```
-
-See SKILL.md for detailed templates with all context options.
 
 ---
 
-## Critical Rules
+## Quick Reference (Critical Rules Only)
 
-### 0. Handle Missing testIDs First
+For full details, **read SKILL.md**. Here are the critical rules:
 
-**Most codebases lack testIDs.** Before writing tests:
-
-1. Find elements WITHOUT testIDs:
+### 1. Always Discover Before Writing
 ```bash
+grep -rn "testID=" --include="*.tsx" src/ | head -50
+```
+
+### 2. Add Missing testIDs First
+```bash
+# Find elements WITHOUT testIDs
 grep -rn "onPress=\|<Button\|<TextInput" --include="*.tsx" src/ | grep -v "testID" | head -20
 ```
+Then add testIDs to components before writing tests.
 
-2. ADD testIDs to components before writing tests:
-```tsx
-// Add testID to each interactive element
-<TextInput testID="login-email-input" ... />
-<Button testID="login-submit-button" ... />
-```
+### 3. Run Long Commands in Background
+- `detox build` → background (2-10 min)
+- `detox test` → background (5-30+ min)
+- `npx expo prebuild` → background (1-5 min)
 
-3. Naming convention: `{screen}-{element}-{type}`
-   - `login-email-input`, `login-submit-button`, `product-item-0`
-
-4. Fallback if you can't modify code: `by.text('Sign In')` or `by.label('...')`
-
-### 1. UI Discovery Before Writing Tests
-
-**NEVER write tests without first discovering the UI structure.**
-
+### 4. Generate Reports After Tests
 ```bash
-# Find existing testIDs
-grep -rn "testID=" --include="*.tsx" --include="*.jsx" src/ | head -50
-
-# Find screens/pages
-grep -rn "Screen\|Page\|View" --include="*.tsx" src/ | head -30
-
-# iOS Swift projects
-grep -rn "accessibilityIdentifier" --include="*.swift" | head -30
-
-# Android Compose
-grep -rn "testTag" --include="*.kt" | head -30
-```
-
-### 2. Background Execution Required
-
-**Long-running commands MUST run in background** to prevent terminal flooding:
-
-| Command | Why Background |
-|---------|----------------|
-| `detox build` | 2-10 minutes |
-| `detox test` | 5-30+ minutes |
-| `npx expo prebuild` | 1-5 minutes |
-| `pod install` | 1-3 minutes |
-
-### 3. Output Limiting
-
-**ALWAYS limit output** to prevent crashes:
-
-```bash
-# CORRECT
-grep -rn "testID" src/ | head -30
-head -60 src/screens/LoginScreen.tsx
-ls src/screens/ | head -20
-
-# WRONG - can flood terminal
-cat src/screens/LoginScreen.tsx
-find . -name "*.tsx" -exec cat {} \;
-```
-
-## testID Conventions
-
-```typescript
-// Pattern: {screen}-{element}-{type}
-testID="login-screen"              // Screen container
-testID="login-email-input"         // Input field
-testID="login-submit-button"       // Button
-testID="login-error-banner"        // Error display
-testID="product-row-0"             // Indexed list items
-```
-
-### Platform-Specific
-
-| Platform | Method |
-|----------|--------|
-| React Native | `testID="id"` |
-| SwiftUI | `.accessibilityIdentifier("id")` |
-| UIKit | `accessibilityIdentifier = "id"` |
-| Compose | `Modifier.testTag("id")` |
-| XML | `android:contentDescription="id"` |
-
-## Test Naming
-
-```typescript
-// File: e2e/flows/auth/login-flow.test.ts
-
-describe('User Authentication - Login Flow', () => {
-  it('should display welcome screen with login options', async () => {});
-  it('should show validation error for invalid email', async () => {});
-  it('should navigate to home after successful login', async () => {});
-});
-```
-
-**Rules:**
-- Files: `kebab-case.test.ts` (e.g., `login-flow.test.ts`)
-- Describe: `'{Feature} - {Flow}'`
-- It: `'should {action} {result}'`
-
-## Build & Test Commands
-
-```bash
-# Build (run in background - takes 2-10 min)
-npx detox build --configuration ios.sim.debug
-npx detox build --configuration android.emu.debug
-
-# Test with artifacts (run in background - takes 5-30+ min)
-npx detox test --configuration ios.sim.debug --record-videos all --take-screenshots all
-
-# Test specific file
-npx detox test --configuration ios.sim.debug e2e/flows/auth/login-flow.test.ts
-
-# Test with pattern matching
-npx detox test --configuration ios.sim.debug --testNamePattern="should login"
-```
-
-### Expo Projects
-
-```bash
-# Generate native projects first
-npx expo prebuild --clean
-
-# Then build and test as normal
-npx detox build --configuration ios.sim.debug
-```
-
-## Common Test Patterns
-
-### Wait for Elements
-
-```typescript
-await waitFor(element(by.id('home-screen')))
-  .toBeVisible()
-  .withTimeout(10000);
-```
-
-### Form Input
-
-```typescript
-await element(by.id('email-input')).tap();
-await element(by.id('email-input')).typeText('user@example.com');
-await element(by.id('submit-button')).tap();
-```
-
-### Scrolling
-
-```typescript
-await waitFor(element(by.id('item-50')))
-  .toBeVisible()
-  .whileElement(by.id('list'))
-  .scroll(200, 'down');
-```
-
-### Permissions (iOS)
-
-```typescript
-await device.launchApp({
-  permissions: { camera: 'YES', location: 'always' }
-});
-```
-
-### Biometrics
-
-```typescript
-await device.setBiometricEnrollment(true);
-await device.matchFace(); // or matchFinger()
-```
-
-### Deep Links
-
-```typescript
-await device.launchApp({ url: 'myapp://profile/123' });
-await device.openURL({ url: 'myapp://settings' });
-```
-
-### Push Notifications
-
-```typescript
-await device.sendUserNotification({
-  trigger: { type: 'push' },
-  title: 'New Message',
-  body: 'You have a message',
-  payload: { messageId: '123' }
-});
-```
-
-### Background/Foreground
-
-```typescript
-await device.sendToHome();  // Background
-await device.launchApp({ newInstance: false });  // Foreground
-```
-
-### Location Mocking
-
-```typescript
-await device.setLocation(37.7749, -122.4194);  // San Francisco
-```
-
-## File Structure
-
-```
-e2e/
-├── flows/
-│   ├── auth/
-│   │   ├── login-flow.test.ts
-│   │   └── registration-flow.test.ts
-│   ├── profile/
-│   └── settings/
-├── utils/
-│   ├── test-helpers.ts
-│   └── fixtures.ts
-└── jest.config.js
-```
-
-## Report Generation
-
-```bash
-# Standalone report
 node scripts/generate-report.js --artifacts ./artifacts --output ./reports
-
-# Consolidated hub (append mode)
-node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Login Tests"
 ```
 
-## Quick Reference
+---
 
-### Matchers
+## Full Documentation
 
-```typescript
-by.id('testID')           // By testID (preferred)
-by.text('Button Text')    // By visible text
-by.label('Accessibility') // By a11y label
-```
+**Read SKILL.md for complete coverage of:**
 
-### Actions
+| Section | What You'll Learn |
+|---------|-------------------|
+| Prompt Templates | 5 detailed templates for different scenarios |
+| Platform Support | React Native, SwiftUI, UIKit, Compose, XML |
+| Handling Missing testIDs | How to add testIDs to all platforms |
+| Test Patterns | Forms, scrolling, permissions, biometrics, deep links |
+| Background Execution | Why and how to run builds/tests in background |
+| Report Generation | HTML reports with videos, screenshots, dark/light mode |
+| CI/CD Workflows | GitHub Actions, CircleCI, Bitrise templates |
+| Detox Copilot | Natural language testing with LLMs |
 
-```typescript
-.tap()
-.longPress()
-.typeText('text')
-.replaceText('text')
-.clearText()
-.scroll(100, 'down')
-.swipe('left')
-```
-
-### Assertions
-
-```typescript
-expect(element).toBeVisible()
-expect(element).toExist()
-expect(element).toHaveText('text')
-expect(element).not.toBeVisible()
-```
-
-### Device
-
-```typescript
-device.launchApp({ newInstance: true })
-device.launchApp({ delete: true })  // Clear data
-device.takeScreenshot('name')
-device.setLocation(37.7749, -122.4194)
-device.sendToHome()
-device.shake()
-```
-
-## References
-
-- `references/detox-config.md` - Configuration guide
-- `references/android-setup.md` - Android patches
-- `references/pilot-setup.md` - AI test generation
-- `references/ci-workflows.md` - CI/CD setup
-- `examples/` - 28 comprehensive test examples
-
-## Setup Requirements
-
-**macOS (iOS testing):**
-- Xcode 14+ with CLI tools
-- `brew tap wix/brew && brew install applesimutils`
-- Node.js 18+
-
-**Android:**
-- Android SDK with emulator
-- Java 17+
-- Node.js 18+
-
-**Project dependencies:**
-```bash
-npm install --save-dev detox jest @types/jest ts-jest
-```
-
-**Minimal .detoxrc.js:**
-```javascript
-module.exports = {
-  testRunner: { args: { $0: 'jest', config: 'e2e/jest.config.js' }, jest: { setupTimeout: 120000 } },
-  apps: {
-    'ios.debug': { type: 'ios.app', binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/YourApp.app', build: 'xcodebuild -workspace ios/YourApp.xcworkspace -scheme YourApp -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build' },
-    'android.debug': { type: 'android.apk', binaryPath: 'android/app/build/outputs/apk/debug/app-debug.apk', build: 'cd android && ./gradlew assembleDebug' }
-  },
-  devices: {
-    simulator: { type: 'ios.simulator', device: { type: 'iPhone 15' } },
-    emulator: { type: 'android.emulator', device: { avdName: 'Pixel_4_API_33' } }
-  },
-  configurations: {
-    'ios.sim.debug': { device: 'simulator', app: 'ios.debug' },
-    'android.emu.debug': { device: 'emulator', app: 'android.debug' }
-  }
-};
-```
-
-See `references/detox-config.md` for complete configuration options.
-
-## Detox Copilot (Natural Language Testing)
-
-Built-in LLM-powered testing - write tests in plain English:
-
-```typescript
-await copilot.perform(
-  'Navigate to the Products page',
-  'Add the first item to cart',
-  'Verify cart badge shows 1'
-);
-```
-
-See SKILL.md for full setup instructions.
+---
 
 ## External Links
 
 - [Detox Documentation](https://wix.github.io/Detox/)
-- [Detox Copilot](https://wix.github.io/Detox/docs/copilot/testing-with-copilot)
-- [Agent Skills Specification](https://agentskills.io/specification)
-- [AGENTS.md Standard](https://agents.md/)
+- [Full SKILL.md Reference](SKILL.md)
+- [Example Tests](examples/)

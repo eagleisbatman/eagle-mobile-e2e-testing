@@ -142,42 +142,63 @@ Once installed, use these prompt templates to get the best results from your AI 
 
 > *"Test biometric authentication in my iOS SwiftUI app"*
 
-### Recommended Prompt Template
+### Recommended Prompt Template (Complete E2E Workflow)
 
-For best results, provide context about your project:
+For the **full workflow** (setup → write → run → report), use this template:
 
-> Write E2E tests for [FEATURE] in my mobile app.
+> Set up complete E2E testing for my mobile app and run tests with reports.
 >
-> Stack: [React Native Expo / CLI / SwiftUI / Jetpack Compose]
-> Screens folder: [src/screens/ or src/features/*/screens/]
-> Navigation: [React Navigation / Expo Router / Native]
-> Screen file: [path/to/Screen.tsx]
+> **PROJECT:**
+> - App: [MyApp]
+> - Framework: [React Native Expo / CLI / SwiftUI / Compose]
+> - Project root: [/path/to/project]
+> - Screens: [src/screens/ or src/features/*/screens/]
+> - Navigation: [React Navigation / Expo Router / Native]
 >
-> Flow to test:
-> 1. User [action] → sees [result]
-> 2. User [action] → sees [result]
+> **WHAT I NEED:**
+> 1. Set up Detox (install, configure)
+> 2. Discover UI and existing testIDs
+> 3. Add missing testIDs to components
+> 4. Write tests for: [list features]
+> 5. Build and run tests
+> 6. Generate HTML report with videos
 >
-> Known testIDs: [list them or "please discover and add missing ones"]
-> Special requirements: [biometrics / deep links / offline / none]
+> **FEATURES TO TEST:**
+> - [Feature 1]: User flow description
+> - [Feature 2]: User flow description
+>
+> **DEVICES:** [iPhone 15 / Pixel 4 API 33]
+> **SPECIAL:** [biometrics / deep links / CI setup / none]
 
-### Example Prompt
+### Example Prompt (Complete Workflow)
 
-> Write E2E tests for user authentication in my React Native Expo app.
+> Set up complete E2E testing for my e-commerce app and run tests with reports.
 >
-> Stack: React Native Expo with TypeScript
-> Screens folder: src/features/auth/screens/
-> Navigation: Expo Router with tabs
-> Screen file: src/features/auth/screens/LoginScreen.tsx
+> **PROJECT:**
+> - App: ShopApp
+> - Framework: React Native Expo with TypeScript
+> - Project root: /Users/me/projects/shopapp
+> - Screens: src/features/*/screens/
+> - Navigation: Expo Router with bottom tabs
 >
-> Flow to test:
-> 1. User enters valid email/password → taps Login → sees Home screen
-> 2. User enters invalid email → sees validation error
-> 3. User taps "Forgot Password" → navigates to reset screen
+> **WHAT I NEED:**
+> 1. Set up Detox from scratch
+> 2. Discover all screens and testIDs
+> 3. Add missing testIDs to components
+> 4. Write tests for login, products, cart, checkout
+> 5. Run tests on iOS simulator with video recording
+> 6. Generate HTML report
 >
-> Known testIDs: Please discover existing ones and add any missing testIDs
-> Special requirements: none
+> **FEATURES TO TEST:**
+> - Login: User enters email/password → taps Login → sees Home
+> - Products: User browses products → taps item → sees details
+> - Cart: User adds to cart → views cart → sees items
+> - Checkout: User proceeds to checkout → enters address → completes order
+>
+> **DEVICES:** iPhone 15 Simulator
+> **SPECIAL:** Set up GitHub Actions CI after tests pass
 
-See [SKILL.md](SKILL.md) for 5 detailed prompt templates covering setup, feature testing, full suites, quick tests, and debugging.
+See [SKILL.md](SKILL.md) for 5 detailed templates covering different scenarios.
 
 ---
 

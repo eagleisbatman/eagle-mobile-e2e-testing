@@ -40,174 +40,265 @@ A comprehensive, production-ready framework for end-to-end mobile testing using 
 
 ## Prompt Templates for AI Assistants
 
-Use these templates when prompting your AI assistant (Claude Code, Cursor, Codex, Copilot, etc.) to write E2E tests. **The more context you provide, the better the tests.**
+Use these templates when prompting your AI assistant (Claude Code, Cursor, Codex, Copilot, etc.). **These cover the COMPLETE end-to-end workflow: setup → configure → discover → add testIDs → write tests → run → generate reports.**
 
-### Template 1: Initial Setup (First Time)
+### Template 1: Complete End-to-End Setup and Testing (Recommended)
 
-```
-I need to set up Detox E2E testing for my mobile app. Here's my project context:
-
-**Technology Stack:**
-- Framework: [React Native Expo / React Native CLI / SwiftUI / UIKit / Jetpack Compose / XML]
-- Language: [TypeScript / JavaScript / Swift / Kotlin]
-- State Management: [Redux / MobX / Zustand / Context / None]
-- Navigation: [React Navigation / Expo Router / Native / Other]
-
-**Project Structure:**
-- Root directory: [/path/to/project]
-- Source code location: [src/ / app/ / lib/]
-- Screens/Pages folder: [src/screens/ / src/features/ / app/(tabs)/]
-- Components folder: [src/components/]
-- Navigation config: [src/navigation/ / app/_layout.tsx]
-
-**Current State:**
-- Detox already installed: [Yes / No]
-- Existing testIDs: [Yes, some / No, need to add]
-- CI/CD platform: [GitHub Actions / CircleCI / Bitrise / None yet]
-
-Please:
-1. Discover my existing UI structure (screens, testIDs)
-2. Set up Detox configuration
-3. Create the e2e folder structure
-4. Write initial test for [specific screen/flow]
-```
-
-### Template 2: Write Tests for Specific Feature
+Use this template for the full workflow from scratch:
 
 ```
-Write E2E tests for [FEATURE NAME] in my mobile app.
+Set up complete E2E testing for my mobile app and run tests with reports.
 
-**App Context:**
-- Framework: [React Native Expo / etc.]
-- Screen location: [src/screens/LoginScreen.tsx / etc.]
-- Navigation: The screen is accessed via [tab / stack / drawer] from [HomeScreen / etc.]
+=== PROJECT CONTEXT ===
+App name: [MyApp]
+Framework: [React Native Expo / React Native CLI / SwiftUI / UIKit / Jetpack Compose]
+Language: [TypeScript / JavaScript / Swift / Kotlin]
+Project root: [/path/to/my/project]
+Screens folder: [src/screens/ or src/features/*/screens/ or app/(tabs)/]
+Components folder: [src/components/]
+Navigation: [React Navigation v6 / Expo Router / Native UINavigationController / Jetpack Navigation]
 
-**Feature Details:**
-- Screen name: [LoginScreen / CheckoutScreen / etc.]
-- Main user flows to test:
-  1. [User enters email and password, taps login, sees home screen]
-  2. [User enters invalid email, sees validation error]
-  3. [User taps forgot password, navigates to reset screen]
+=== WHAT I NEED (Full Workflow) ===
+1. SETUP: Install Detox and create .detoxrc.js configuration
+2. DISCOVER: Find all screens and existing testIDs in my codebase
+3. ADD testIDs: Identify components missing testIDs and add them
+4. WRITE TESTS: Create E2E tests for these features:
+   - [Feature 1]: [User opens app → sees home screen → taps profile → sees profile page]
+   - [Feature 2]: [User taps login → enters credentials → submits → sees dashboard]
+   - [Feature 3]: [User adds item to cart → goes to checkout → completes purchase]
+5. BUILD: Build the app for testing (iOS simulator / Android emulator)
+6. RUN TESTS: Execute all tests with video recording
+7. GENERATE REPORT: Create HTML report with videos, screenshots, pass/fail summary
 
-**Existing testIDs (if known):**
-- [login-email-input]
-- [login-password-input]
-- [login-submit-button]
-- [Or say "Please discover testIDs first"]
+=== TARGET DEVICES ===
+iOS Simulator: [iPhone 15 / iPhone 14 Pro / etc.]
+Android Emulator: [Pixel 4 API 33 / Pixel 6 API 34 / etc.]
+Run on: [iOS only / Android only / Both]
 
-**Special Requirements:**
-- [ ] Test with biometric authentication
-- [ ] Test offline behavior
-- [ ] Test deep link: [myapp://login?token=xyz]
+=== SPECIAL REQUIREMENTS ===
+- [ ] Biometric authentication (Face ID / Touch ID / Fingerprint)
+- [ ] Deep links: [myapp://product/123, myapp://checkout]
+- [ ] Offline mode testing
 - [ ] Mock API responses
-- [ ] Record video of test run
+- [ ] Push notification handling
+- [ ] CI/CD setup for: [GitHub Actions / CircleCI / Bitrise / None]
 
-Please follow best practices: discover UI first, use background execution, generate HTML report.
+=== CURRENT STATE ===
+Detox installed: [Yes / No]
+Existing testIDs: [Yes, some / No, none / Don't know]
+Previous E2E tests: [Yes / No]
 ```
 
-### Template 3: Full Test Suite Generation
+### Template 2: Add E2E Tests to Existing Detox Setup
+
+Use when Detox is already configured:
 
 ```
-Create a comprehensive E2E test suite for my [APP TYPE] mobile app.
+Add E2E tests to my existing Detox setup and run them.
 
-**App Overview:**
-- App name: [MyApp]
-- Framework: [React Native Expo]
-- Purpose: [E-commerce / Social Media / Banking / Productivity / etc.]
+=== PROJECT INFO ===
+Framework: [React Native Expo]
+Screens: [src/features/*/screens/]
+Detox config: [.detoxrc.js already exists]
 
-**Project Paths:**
-- Root: [/Users/me/projects/myapp]
-- Screens: [src/features/*/screens/ or src/screens/]
-- Components: [src/components/]
-- Navigation: [src/navigation/AppNavigator.tsx]
-- API services: [src/services/ or src/api/]
+=== NEW TESTS NEEDED ===
+Feature: [Checkout Flow]
+Screen files:
+- src/features/cart/screens/CartScreen.tsx
+- src/features/checkout/screens/CheckoutScreen.tsx
+- src/features/checkout/screens/PaymentScreen.tsx
 
-**Key User Flows to Cover:**
-1. Authentication: [Login, Register, Forgot Password, Logout]
-2. Main Feature: [Browse products, Add to cart, Checkout]
-3. Profile: [View profile, Edit settings, Change password]
-4. [Add more flows specific to your app]
+User flows to test:
+1. User views cart with items → taps "Checkout" → sees checkout form
+2. User fills shipping address → taps "Continue" → sees payment screen
+3. User enters payment details → taps "Pay Now" → sees confirmation
+4. User with empty cart → sees "Cart is empty" message
 
-**Test Configuration:**
-- Target devices: [iOS Simulator / Android Emulator / Both]
-- iOS device: [iPhone 15 / iPhone 14 Pro / etc.]
-- Android device: [Pixel 4 API 33 / etc.]
+=== EXECUTION ===
+After writing tests:
+1. Run on: [iOS Simulator - iPhone 15]
+2. Record videos: Yes
+3. Take screenshots: At each step
+4. Generate HTML report: Yes, save to ./reports/
 
-**Output Requirements:**
-- Generate HTML report after tests
-- Record videos for failed tests
-- Take screenshots at key steps
-- Organize tests by feature in e2e/flows/
-
-Please:
-1. First discover all screens and existing testIDs
-2. Identify missing testIDs and suggest additions
-3. Create test files organized by feature
-4. Set up CI workflow for [GitHub Actions / CircleCI]
+=== testIDs ===
+Known testIDs: [cart-screen, checkout-button, or "please discover"]
+Add missing testIDs: Yes, to any components that need them
 ```
 
-### Template 4: Quick Single Test
+### Template 3: Quick Single Feature Test with Report
+
+Use for testing one specific feature quickly:
 
 ```
-Write a quick E2E test for [SPECIFIC ACTION].
+Write and run E2E test for [LOGIN FEATURE] with HTML report.
 
-Context:
-- File: [src/screens/ProductScreen.tsx]
-- Action: [User taps "Add to Cart" button, sees success toast]
-- testID: [product-add-cart-button] (or discover it)
+=== QUICK CONTEXT ===
+Framework: [React Native Expo]
+Screen file: [src/screens/LoginScreen.tsx]
+Navigation: User accesses login from welcome screen via "Sign In" button
 
-Just write the test, run it, and show me the result.
+=== TEST THIS FLOW ===
+1. App launches → Welcome screen visible
+2. Tap "Sign In" → Login screen appears
+3. Enter email: test@example.com
+4. Enter password: password123
+5. Tap "Login" button
+6. Verify: Home screen appears with user greeting
+
+=== EXECUTION ===
+1. Discover/add testIDs if missing
+2. Write the test
+3. Build app (background)
+4. Run test with video recording
+5. Generate HTML report
+
+Device: [iPhone 15 Simulator]
 ```
 
-### Template 5: Debug Failing Test
+### Template 4: Full App Test Suite with CI/CD
+
+Use for comprehensive coverage with automation:
 
 ```
-My E2E test is failing. Help me debug it.
+Create complete E2E test suite with CI/CD pipeline.
 
-**Error Message:**
-[Paste the error message here]
+=== APP OVERVIEW ===
+App name: [MyApp]
+Type: [E-commerce / Social / Banking / Productivity]
+Framework: [React Native Expo]
+Project root: [/Users/me/projects/myapp]
 
-**Test File:**
-[e2e/flows/auth/login-flow.test.ts]
+=== PROJECT STRUCTURE ===
+Screens: src/features/*/screens/
+Components: src/components/
+Navigation: src/navigation/AppNavigator.tsx
+API services: src/services/api/
 
-**What Should Happen:**
-[User taps login button, navigates to home screen]
+=== TEST COVERAGE NEEDED ===
 
-**What Actually Happens:**
-[Test times out waiting for home-screen element]
+Authentication:
+- Login with email/password
+- Login with biometrics
+- Registration flow
+- Forgot password
+- Logout
 
-**Recent Changes:**
-[Changed navigation structure / Updated component / etc.]
+Main Features:
+- [Feature 1]: Browse products → View details → Add to cart
+- [Feature 2]: View cart → Update quantities → Remove items
+- [Feature 3]: Checkout → Enter address → Payment → Confirmation
 
-Please:
+Settings:
+- Update profile
+- Change notification preferences
+- Dark mode toggle
+
+Edge Cases:
+- Offline mode behavior
+- Session expiration
+- Deep link handling: myapp://product/[id]
+
+=== EXECUTION PLAN ===
+1. Set up Detox (if not already)
+2. Discover all screens and testIDs
+3. Add missing testIDs to components
+4. Create test files organized by feature:
+   - e2e/flows/auth/
+   - e2e/flows/products/
+   - e2e/flows/cart/
+   - e2e/flows/checkout/
+   - e2e/flows/settings/
+5. Build app for both platforms
+6. Run full test suite
+7. Generate consolidated HTML report
+
+=== CI/CD ===
+Platform: [GitHub Actions]
+Triggers: [On PR to main, On push to main]
+Artifacts: Upload HTML report and videos
+
+=== DEVICES ===
+iOS: iPhone 15, iPhone 14
+Android: Pixel 4 API 33
+```
+
+### Template 5: Debug and Fix Failing Tests
+
+```
+Debug my failing E2E test and fix it.
+
+=== ERROR ===
+[Paste full error message here]
+
+=== TEST FILE ===
+Path: [e2e/flows/auth/login.test.ts]
+Test name: "should navigate to home after successful login"
+
+=== EXPECTED BEHAVIOR ===
+User enters credentials → taps login → home screen appears
+
+=== ACTUAL BEHAVIOR ===
+Test times out waiting for element with id "home-screen"
+
+=== RECENT CHANGES ===
+[What changed recently that might have caused this?]
+- Changed navigation structure
+- Renamed components
+- Updated testIDs
+
+=== WHAT I NEED ===
 1. Analyze the error
-2. Check if testIDs still exist in the codebase
-3. Suggest fixes
-4. Run the test again after fixing
+2. Check if testIDs still exist in codebase
+3. Fix the test or the component
+4. Re-run the test
+5. Confirm it passes
 ```
 
-### Key Context to Always Include
+### Key Context Checklist
+
+Always include these for best results:
 
 | Context | Why It Matters | Example |
 |---------|----------------|---------|
-| **Framework** | Determines testID method | `React Native Expo` |
-| **Screen folder path** | Agent knows where to look | `src/features/auth/screens/` |
-| **Navigation type** | Affects how to navigate in tests | `Expo Router with tabs` |
-| **Existing testIDs** | Prevents duplicate work | `login-email-input, login-button` |
-| **Target flow** | Focuses the test scope | `User login with email/password` |
-| **Special features** | Enables advanced testing | `Biometrics, deep links, offline` |
+| **Framework** | Determines testID syntax | `React Native Expo` |
+| **Project root** | Agent knows where files are | `/Users/me/projects/myapp` |
+| **Screens folder** | Where to find UI components | `src/features/*/screens/` |
+| **Navigation type** | How screens connect | `Expo Router with tabs` |
+| **User flows** | What to actually test | `Login → Home → Profile` |
+| **Devices** | Where to run tests | `iPhone 15, Pixel 4 API 33` |
+| **Output needs** | Reports, videos, CI | `HTML report with videos` |
 
 ### Pro Tips
 
-1. **Be Specific About Paths**: Instead of "my login screen", say `src/features/auth/screens/LoginScreen.tsx`
+1. **Be Specific About Paths**: `/Users/me/myapp/src/screens/` not just "my screens folder"
 
-2. **Mention Your Navigation**: "Using React Navigation v6 with a bottom tab navigator containing Home, Search, Profile tabs"
+2. **Describe Full User Flows**: "User opens app → taps Login → enters email → taps Submit → sees Home" not just "test login"
 
-3. **List Known testIDs**: If you already have some, share them so the agent doesn't search unnecessarily
+3. **Mention What's Missing**: "No testIDs exist yet" helps the agent know to add them first
 
-4. **Describe the User Flow**: "User opens app → sees welcome screen → taps 'Sign In' → enters email/password → taps 'Login' → sees home feed"
+4. **Specify Output Needs**: "Generate HTML report with videos" ensures you get the full artifacts
 
-5. **Specify Device Targets**: "Test on iPhone 15 simulator and Pixel 4 API 33 emulator"
+5. **Include Device Targets**: "iPhone 15 and Pixel 4 API 33" avoids assumptions
+
+6. **Request the Full Workflow**: "Set up, write tests, run, and generate report" ensures nothing is skipped
+
+### Full E2E Flow Reminder
+
+The AI should execute this complete workflow:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  1. SETUP      │ Install Detox, create .detoxrc.js              │
+│  2. DISCOVER   │ Find screens, navigation, existing testIDs     │
+│  3. ADD IDs    │ Add testIDs to components that need them       │
+│  4. WRITE      │ Create test files with proper structure        │
+│  5. BUILD      │ Build app (background, 2-10 min)               │
+│  6. RUN        │ Execute tests (background, 5-30 min)           │
+│  7. REPORT     │ Generate HTML with videos/screenshots          │
+│  8. CI/CD      │ Set up automation (if requested)               │
+└──────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
