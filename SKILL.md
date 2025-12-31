@@ -1,6 +1,6 @@
 ---
 name: eagle-mobile-e2e-testing
-description: Comprehensive end-to-end mobile testing skill for React Native (Expo/CLI), Jetpack Compose, SwiftUI, UIKit, and XML-based Android/iOS apps. Use this skill when you need to (1) Set up Detox for E2E testing, (2) Write automated test cases with proper naming conventions, (3) Generate tests using AI/LLM via Wix Pilot, (4) Record test videos and screenshots, (5) Create HTML reports with embedded media, (6) Test permissions, biometrics, deep links, offline mode, (7) Mock network requests and simulate latency, (8) Test push notifications and background states, or (9) Set up CI/CD pipelines. Supports iOS simulators, Android emulators, with video recording, screenshot capture, and timeline tracing.
+description: Comprehensive end-to-end mobile testing skill for React Native (Expo/CLI), Jetpack Compose, SwiftUI, UIKit, and XML-based Android/iOS apps. CRITICAL - Before writing tests, you MUST first discover the UI structure using targeted grep searches (NOT full file dumps). Run all builds and test suites in BACKGROUND to prevent terminal flooding. Use this skill for (1) Detox E2E setup, (2) Writing test cases after UI discovery, (3) AI test generation via Wix Pilot, (4) Video/screenshot recording, (5) HTML report generation, (6) Testing permissions/biometrics/deep-links/offline, (7) Network mocking, (8) Push notifications, (9) CI/CD pipelines.
 ---
 
 # Eagle Mobile E2E Testing Skill
@@ -19,6 +19,131 @@ A comprehensive, production-ready framework for end-to-end mobile testing using 
 | Android | XML Views | Full | `android:contentDescription="id"` | All Android versions |
 | Android | Kotlin Views | Full | `view.contentDescription = "id"` | Programmatic views |
 | Flutter | - | Not Supported | - | Use flutter_driver instead |
+
+---
+
+## CRITICAL: Codebase Discovery Before Writing Tests
+
+**IMPORTANT:** Before writing ANY test cases, you MUST systematically discover the UI structure. Do NOT flood the terminal with large file dumps.
+
+### Step 1: Identify Screen Components (Targeted Search)
+
+```bash
+# Find screen/page components - use grep, don't cat entire files
+grep -rn "Screen\|Page\|View" --include="*.tsx" --include="*.jsx" src/ | head -30
+
+# Find existing testIDs in the codebase
+grep -rn "testID=" --include="*.tsx" --include="*.jsx" src/ | head -50
+
+# For iOS Swift projects
+grep -rn "accessibilityIdentifier" --include="*.swift" | head -30
+
+# For Android Compose
+grep -rn "testTag" --include="*.kt" | head -30
+```
+
+### Step 2: Map Navigation Structure
+
+```bash
+# Find navigation configuration
+grep -rn "Stack.Screen\|Tab.Screen\|createNativeStackNavigator" --include="*.tsx" src/
+
+# Find route definitions
+grep -rn "routes\|screens\|navigation" --include="*.ts" --include="*.tsx" src/navigation/ 2>/dev/null | head -20
+```
+
+### Step 3: Read Components Selectively
+
+**DO NOT** dump entire component files. Read only the sections you need:
+
+```bash
+# Read just the first 60 lines to see component structure
+head -60 src/screens/LoginScreen.tsx
+
+# Search for specific elements within a file
+grep -n "testID\|onPress\|Button\|Input\|Text" src/screens/LoginScreen.tsx
+```
+
+### Step 4: Create testID Inventory
+
+Before writing tests, create a mental map of existing testIDs:
+
+```bash
+# Export all testIDs to review
+grep -rhn "testID=\"[^\"]*\"" --include="*.tsx" src/ | sed 's/.*testID="\([^"]*\)".*/\1/' | sort -u
+```
+
+---
+
+## CRITICAL: Background Execution Guidelines
+
+**IMPORTANT:** Long-running commands MUST run in background to prevent terminal flooding and crashes.
+
+### Commands That MUST Run in Background
+
+| Command Type | Why Background | Example |
+|--------------|----------------|---------|
+| `detox build` | Takes 2-10 minutes | Build iOS/Android app |
+| `detox test` | Takes 5-30+ minutes | Run full test suite |
+| `npx expo prebuild` | Takes 1-5 minutes | Generate native projects |
+| `pod install` | Takes 1-3 minutes | Install iOS dependencies |
+| `./gradlew assembleDebug` | Takes 2-10 minutes | Build Android |
+
+### How to Run in Background
+
+```typescript
+// When using Bash tool, set run_in_background: true
+{
+  "command": "npx detox build --configuration ios.sim.debug",
+  "run_in_background": true,
+  "description": "Build iOS app for testing"
+}
+```
+
+### Monitoring Background Tasks
+
+```bash
+# Check if build is still running
+ps aux | grep -E "detox|xcodebuild|gradle" | grep -v grep
+
+# Check background task output periodically (use TaskOutput tool)
+# Do NOT repeatedly poll - check every 30-60 seconds
+```
+
+### Test Execution Strategy
+
+```bash
+# WRONG: Running all tests inline (will flood terminal)
+npx detox test --configuration ios.sim.debug
+
+# CORRECT: Run in background, check results later
+# Use run_in_background: true, then use TaskOutput to get results
+```
+
+---
+
+## CRITICAL: Terminal Efficiency Rules
+
+1. **NEVER** cat/read entire large files - use head, grep, or targeted line ranges
+2. **NEVER** run builds inline - always use background execution
+3. **NEVER** dump test output to terminal - capture to file or run in background
+4. **ALWAYS** use `| head -N` when output might be large
+5. **ALWAYS** use targeted searches instead of reading entire directories
+6. **LIMIT** grep results with `| head -30` or `| head -50`
+
+### Safe Patterns
+
+```bash
+# Safe: Limited output
+ls src/screens/ | head -20
+grep -rn "testID" src/ | head -30
+head -60 src/screens/LoginScreen.tsx
+
+# Unsafe: Can flood terminal
+cat src/screens/LoginScreen.tsx          # Could be 500+ lines
+find . -name "*.tsx" -exec cat {} \;     # Dumps everything
+npx detox test                            # Long output, run in background
+```
 
 ---
 
