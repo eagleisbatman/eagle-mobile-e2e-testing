@@ -290,6 +290,9 @@ function generateHTML(tests, config) {
       --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
       --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
       --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.4);
+      --accent-primary: hsl(0 0% 98%);
+      --accent-secondary: hsl(240 3.7% 15.9%);
+      --accent-gradient: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(240 5% 64.9%) 100%);
       --success-bg: hsl(142.1 76.2% 36.3% / 0.15);
       --error-bg: hsl(0 84.2% 60.2% / 0.15);
       --warning-bg: hsl(38 92% 50% / 0.15);
@@ -560,6 +563,12 @@ function generateHTML(tests, config) {
       border-color: var(--accent-primary);
       background: var(--accent-primary);
       color: white;
+    }
+
+    [data-theme="dark"] .test-item.active {
+      background: hsl(240 3.7% 25%);
+      border-color: hsl(240 4.9% 83.9%);
+      color: hsl(0 0% 98%);
     }
 
     .test-item.active .test-status { opacity: 0.9; box-shadow: 0 0 0 2px rgba(255,255,255,0.3); }
