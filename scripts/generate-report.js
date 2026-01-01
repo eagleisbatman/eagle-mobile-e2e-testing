@@ -103,9 +103,16 @@ function scanArtifacts(artifactsDir) {
     const testName = path.basename(dir);
 
     if (!testMap.has(testName)) {
+      const metadata = loadTestCaseMetadata(dir);
       testMap.set(testName, {
-        id: testName.replace(/[^a-zA-Z0-9]/g, '-'),
-        name: formatTestName(testName),
+        id: metadata?.id || testName.replace(/[^a-zA-Z0-9]/g, '-'),
+        name: metadata?.title || formatTestName(testName),
+        description: metadata?.description || null,
+        preconditions: metadata?.preconditions || [],
+        steps: metadata?.steps || [],
+        expectedResults: metadata?.expectedResults || [],
+        priority: metadata?.priority || null,
+        category: metadata?.category || null,
         directory: dir,
         videos: [],
         screenshots: [],
@@ -164,6 +171,44 @@ function formatTestName(name) {
     .replace(/\.(test|spec)\.(js|ts)$/, '')
     .replace(/^./, c => c.toUpperCase())
     .trim() || 'Test';
+}
+
+/**
+ * Load test case metadata from test-case.json if exists
+ * Format:
+ * {
+ *   "id": "TC-AUTH-001",
+ *   "title": "Login with valid credentials",
+ *   "description": "Verify user can login with valid email and PIN",
+ *   "preconditions": ["User account exists", "App is freshly launched"],
+ *   "steps": [
+ *     "Launch app and wait for welcome screen",
+ *     "Tap 'Sign In' button",
+ *     "Enter valid email address",
+ *     "Enter valid 4-digit PIN",
+ *     "Tap 'Login' button"
+ *   ],
+ *   "expectedResults": [
+ *     "Welcome screen displays with Sign In option",
+ *     "Login screen appears with email and PIN fields",
+ *     "Email field accepts input",
+ *     "PIN field accepts numeric input",
+ *     "User is redirected to Home screen"
+ *   ],
+ *   "priority": "P0",
+ *   "category": "Authentication"
+ * }
+ */
+function loadTestCaseMetadata(testDir) {
+  const metadataPath = path.join(testDir, 'test-case.json');
+  if (fs.existsSync(metadataPath)) {
+    try {
+      return JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
 }
 
 /**
@@ -664,6 +709,95 @@ function generateHTML(tests, config) {
     .badge.failed { background: var(--error-bg); color: var(--error); }
     .badge.unknown { background: var(--warning-bg); color: var(--warning); }
     .badge.duration { background: var(--bg-tertiary); color: var(--text-secondary); text-transform: none; }
+    .badge.priority { background: hsl(262 83% 58% / 0.15); color: hsl(262 83% 58%); }
+    .badge.category { background: hsl(199 89% 48% / 0.15); color: hsl(199 89% 48%); }
+
+    /* Test Description */
+    .test-description {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0.75rem 0 1rem 0;
+      line-height: 1.6;
+    }
+
+    /* Preconditions Section */
+    .preconditions-section {
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      border-left: 3px solid hsl(199 89% 48%);
+    }
+
+    .preconditions-list {
+      margin: 0.75rem 0 0 1.25rem;
+      padding: 0;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .preconditions-list li {
+      margin-bottom: 0.375rem;
+    }
+
+    /* Test Steps Table */
+    .test-steps-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .test-steps-table {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .test-steps-header {
+      display: grid;
+      grid-template-columns: 40px 1fr 1fr;
+      gap: 1rem;
+      padding: 0.875rem 1rem;
+      background: var(--bg-tertiary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .test-step-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 1fr;
+      gap: 1rem;
+      padding: 0.875rem 1rem;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.15s ease;
+    }
+
+    .test-step-row:last-child {
+      border-bottom: none;
+    }
+
+    .test-step-row:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .step-action-col {
+      color: var(--text-primary);
+    }
+
+    .step-expected {
+      color: var(--text-secondary);
+      font-size: 0.8125rem;
+    }
 
     /* Video Player */
     .video-container {
@@ -1223,12 +1357,44 @@ function generateHTML(tests, config) {
         <div class="detail-header">
           <div class="detail-title">
             <h2>\${test.name}</h2>
+            \${test.description ? \`<p class="test-description">\${test.description}</p>\` : ''}
             <div class="detail-badges">
               <span class="badge \${test.status}">\${test.status.toUpperCase()}</span>
+              \${test.priority ? \`<span class="badge priority">\${test.priority}</span>\` : ''}
+              \${test.category ? \`<span class="badge category">\${test.category}</span>\` : ''}
               \${test.duration ? \`<span class="badge duration"><i data-lucide="clock" style="width:12px;height:12px;display:inline;vertical-align:-2px;"></i> \${formatDuration(test.duration)}</span>\` : ''}
             </div>
           </div>
         </div>
+
+        \${test.preconditions && test.preconditions.length > 0 ? \`
+        <div class="preconditions-section">
+          <div class="section-title"><i data-lucide="shield-check" style="width:16px;height:16px;display:inline;vertical-align:-3px;"></i> Preconditions</div>
+          <ul class="preconditions-list">
+            \${test.preconditions.map(p => \`<li>\${p}</li>\`).join('')}
+          </ul>
+        </div>
+        \` : ''}
+
+        \${test.steps && test.steps.length > 0 && typeof test.steps[0] === 'string' ? \`
+        <div class="test-steps-section">
+          <div class="section-title"><i data-lucide="list-ordered" style="width:16px;height:16px;display:inline;vertical-align:-3px;"></i> Test Steps</div>
+          <div class="test-steps-table">
+            <div class="test-steps-header">
+              <span class="step-num">#</span>
+              <span class="step-action-col">Action</span>
+              <span class="step-expected">Expected Result</span>
+            </div>
+            \${test.steps.map((step, i) => \`
+            <div class="test-step-row">
+              <span class="step-num">\${i + 1}</span>
+              <span class="step-action-col">\${step}</span>
+              <span class="step-expected">\${test.expectedResults?.[i] || '-'}</span>
+            </div>
+            \`).join('')}
+          </div>
+        </div>
+        \` : ''}
 
         <div class="video-container">
           \${test.videos && test.videos.length > 0 ? \`
@@ -1344,12 +1510,44 @@ function generateDetailPanel(test) {
     <div class="detail-header">
       <div class="detail-title">
         <h2>${test.name}</h2>
+        ${test.description ? `<p class="test-description">${test.description}</p>` : ''}
         <div class="detail-badges">
           <span class="badge ${test.status}">${test.status.toUpperCase()}</span>
+          ${test.priority ? `<span class="badge priority">${test.priority}</span>` : ''}
+          ${test.category ? `<span class="badge category">${test.category}</span>` : ''}
           ${test.duration ? `<span class="badge duration"><i data-lucide="clock" style="width:12px;height:12px;display:inline;vertical-align:-2px;"></i> ${formatDuration(test.duration)}</span>` : ''}
         </div>
       </div>
     </div>
+
+    ${test.preconditions && test.preconditions.length > 0 ? `
+    <div class="preconditions-section">
+      <div class="section-title"><i data-lucide="shield-check" style="width:16px;height:16px;display:inline;vertical-align:-3px;"></i> Preconditions</div>
+      <ul class="preconditions-list">
+        ${test.preconditions.map(p => `<li>${p}</li>`).join('')}
+      </ul>
+    </div>
+    ` : ''}
+
+    ${test.steps && test.steps.length > 0 && typeof test.steps[0] === 'string' ? `
+    <div class="test-steps-section">
+      <div class="section-title"><i data-lucide="list-ordered" style="width:16px;height:16px;display:inline;vertical-align:-3px;"></i> Test Steps</div>
+      <div class="test-steps-table">
+        <div class="test-steps-header">
+          <span class="step-num">#</span>
+          <span class="step-action-col">Action</span>
+          <span class="step-expected">Expected Result</span>
+        </div>
+        ${test.steps.map((step, i) => `
+        <div class="test-step-row">
+          <span class="step-num">${i + 1}</span>
+          <span class="step-action-col">${step}</span>
+          <span class="step-expected">${test.expectedResults?.[i] || '-'}</span>
+        </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
 
     <div class="video-container">
       ${test.videos && test.videos.length > 0 ? `
