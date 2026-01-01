@@ -249,48 +249,51 @@ function generateHTML(tests, config) {
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     :root {
-      /* Light mode colors */
-      --bg-primary: #f8fafc;
-      --bg-secondary: #ffffff;
-      --bg-tertiary: #f1f5f9;
-      --bg-glass: rgba(255, 255, 255, 0.85);
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #94a3b8;
-      --border-color: rgba(0, 0, 0, 0.08);
-      --border-glass: rgba(255, 255, 255, 0.4);
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.12);
-      --accent-primary: #6366f1;
-      --accent-secondary: #8b5cf6;
-      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-      --success: #10b981;
-      --success-bg: rgba(16, 185, 129, 0.12);
-      --error: #ef4444;
-      --error-bg: rgba(239, 68, 68, 0.12);
-      --warning: #f59e0b;
-      --warning-bg: rgba(245, 158, 11, 0.12);
+      /* shadcn/ui default light theme (zinc) */
+      --bg-primary: hsl(0 0% 100%);
+      --bg-secondary: hsl(0 0% 100%);
+      --bg-tertiary: hsl(240 4.8% 95.9%);
+      --bg-glass: hsl(0 0% 100% / 0.8);
+      --text-primary: hsl(240 10% 3.9%);
+      --text-secondary: hsl(240 5.9% 10%);
+      --text-muted: hsl(240 3.8% 46.1%);
+      --border-color: hsl(240 5.9% 90%);
+      --border-glass: hsl(240 5.9% 90%);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.08);
+      --accent-primary: hsl(240 5.9% 10%);
+      --accent-secondary: hsl(240 4.8% 95.9%);
+      --accent-gradient: linear-gradient(135deg, hsl(240 5.9% 10%) 0%, hsl(240 3.8% 46.1%) 100%);
+      --success: hsl(142.1 76.2% 36.3%);
+      --success-bg: hsl(142.1 76.2% 36.3% / 0.1);
+      --error: hsl(0 84.2% 60.2%);
+      --error-bg: hsl(0 84.2% 60.2% / 0.1);
+      --warning: hsl(38 92% 50%);
+      --warning-bg: hsl(38 92% 50% / 0.1);
+      --ring: hsl(240 5.9% 10%);
     }
 
     [data-theme="dark"] {
-      --bg-primary: #0f172a;
-      --bg-secondary: #1e293b;
-      --bg-tertiary: #334155;
-      --bg-glass: rgba(30, 41, 59, 0.85);
-      --text-primary: #f1f5f9;
-      --text-secondary: #cbd5e1;
-      --text-muted: #64748b;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-glass: rgba(255, 255, 255, 0.12);
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
-      --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
-      --success-bg: rgba(16, 185, 129, 0.18);
-      --error-bg: rgba(239, 68, 68, 0.18);
-      --warning-bg: rgba(245, 158, 11, 0.18);
+      /* shadcn/ui default dark theme (zinc) */
+      --bg-primary: hsl(240 10% 3.9%);
+      --bg-secondary: hsl(240 10% 3.9%);
+      --bg-tertiary: hsl(240 3.7% 15.9%);
+      --bg-glass: hsl(240 10% 3.9% / 0.8);
+      --text-primary: hsl(0 0% 98%);
+      --text-secondary: hsl(0 0% 98%);
+      --text-muted: hsl(240 5% 64.9%);
+      --border-color: hsl(240 3.7% 15.9%);
+      --border-glass: hsl(240 3.7% 15.9%);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+      --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.4);
+      --success-bg: hsl(142.1 76.2% 36.3% / 0.15);
+      --error-bg: hsl(0 84.2% 60.2% / 0.15);
+      --warning-bg: hsl(38 92% 50% / 0.15);
+      --ring: hsl(240 4.9% 83.9%);
     }
 
     * {
@@ -312,19 +315,9 @@ function generateHTML(tests, config) {
       line-height: 1.6;
     }
 
-    /* Animated background gradient */
+    /* Subtle background - shadcn style */
     .bg-gradient {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background:
-        radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 100%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
+      display: none;
     }
 
     .container {
