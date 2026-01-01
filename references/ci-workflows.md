@@ -430,7 +430,7 @@ echo "Artifacts uploaded: $ARCHIVE_NAME"
   with:
     payload: |
       {
-        "text": "❌ E2E Tests Failed",
+        "text": "[FAILED] E2E Tests Failed",
         "blocks": [
           {
             "type": "section",

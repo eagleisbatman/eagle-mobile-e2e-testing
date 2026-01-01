@@ -1,6 +1,22 @@
 ---
 name: eagle-mobile-e2e-testing
-description: Comprehensive end-to-end mobile testing skill for React Native (Expo/CLI), Jetpack Compose, SwiftUI, UIKit, and XML-based Android/iOS apps. Use this skill when you need to (1) Set up Detox for E2E testing, (2) Write automated test cases with proper naming conventions, (3) Generate tests using AI/LLM via Wix Pilot, (4) Record test videos and screenshots, (5) Create HTML reports with embedded media, (6) Test permissions, biometrics, deep links, offline mode, (7) Mock network requests and simulate latency, (8) Test push notifications and background states, or (9) Set up CI/CD pipelines. Supports iOS simulators, Android emulators, with video recording, screenshot capture, and timeline tracing.
+description: |
+  Production-grade E2E testing for React Native (Expo/CLI), iOS (SwiftUI/UIKit), and Android (Compose/XML) using Detox.
+  CRITICAL: Before writing tests, discover UI via grep (not file dumps). Run builds/tests in BACKGROUND.
+  Covers: Detox setup, test patterns, AI generation (Detox Copilot, Wix Pilot), video/screenshots, HTML reports,
+  permissions, biometrics, deep links, offline mode, network mocking, push notifications, CI/CD.
+license: MIT
+metadata:
+  author: Gautam Mandewalker
+  version: "1.0.0"
+  repository: https://github.com/eagleisbatman/eagle-mobile-e2e-testing
+  platforms:
+    - claude-code
+    - openai-codex
+    - github-copilot
+    - cursor
+    - windsurf
+    - aider
 ---
 
 # Eagle Mobile E2E Testing Skill
@@ -22,6 +38,550 @@ A comprehensive, production-ready framework for end-to-end mobile testing using 
 
 ---
 
+## Prompt Templates for AI Assistants
+
+Use these templates when prompting your AI assistant (Claude Code, Cursor, Codex, Copilot, etc.). **These cover the COMPLETE end-to-end workflow: setup → configure → discover → add testIDs → write tests → run → generate reports.**
+
+### Template 1: Complete End-to-End Setup and Testing (Recommended)
+
+Use this template for the full workflow from scratch:
+
+```
+Set up complete E2E testing for my mobile app and run tests with reports.
+
+=== PROJECT CONTEXT ===
+App name: [MyApp]
+Framework: [React Native Expo / React Native CLI / SwiftUI / UIKit / Jetpack Compose]
+Language: [TypeScript / JavaScript / Swift / Kotlin]
+Project root: [/path/to/my/project]
+Screens folder: [src/screens/ or src/features/*/screens/ or app/(tabs)/]
+Components folder: [src/components/]
+Navigation: [React Navigation v6 / Expo Router / Native UINavigationController / Jetpack Navigation]
+
+=== WHAT I NEED (Full Workflow) ===
+1. SETUP: Install Detox and create .detoxrc.js configuration
+2. DISCOVER: Find all screens and existing testIDs in my codebase
+3. ADD testIDs: Identify components missing testIDs and add them
+4. WRITE TESTS: Create E2E tests for these features:
+   - [Feature 1]: [User opens app → sees home screen → taps profile → sees profile page]
+   - [Feature 2]: [User taps login → enters credentials → submits → sees dashboard]
+   - [Feature 3]: [User adds item to cart → goes to checkout → completes purchase]
+5. BUILD: Build the app for testing (iOS simulator / Android emulator)
+6. RUN TESTS: Execute all tests with video recording
+7. GENERATE REPORT: Create HTML report with videos, screenshots, pass/fail summary
+
+=== TARGET DEVICES ===
+iOS Simulator: [iPhone 15 / iPhone 14 Pro / etc.]
+Android Emulator: [Pixel 4 API 33 / Pixel 6 API 34 / etc.]
+Run on: [iOS only / Android only / Both]
+
+=== SPECIAL REQUIREMENTS ===
+- [ ] Biometric authentication (Face ID / Touch ID / Fingerprint)
+- [ ] Deep links: [myapp://product/123, myapp://checkout]
+- [ ] Offline mode testing
+- [ ] Mock API responses
+- [ ] Push notification handling
+- [ ] CI/CD setup for: [GitHub Actions / CircleCI / Bitrise / None]
+
+=== CURRENT STATE ===
+Detox installed: [Yes / No]
+Existing testIDs: [Yes, some / No, none / Don't know]
+Previous E2E tests: [Yes / No]
+```
+
+### Template 2: Add E2E Tests to Existing Detox Setup
+
+Use when Detox is already configured:
+
+```
+Add E2E tests to my existing Detox setup and run them.
+
+=== PROJECT INFO ===
+Framework: [React Native Expo]
+Screens: [src/features/*/screens/]
+Detox config: [.detoxrc.js already exists]
+
+=== NEW TESTS NEEDED ===
+Feature: [Checkout Flow]
+Screen files:
+- src/features/cart/screens/CartScreen.tsx
+- src/features/checkout/screens/CheckoutScreen.tsx
+- src/features/checkout/screens/PaymentScreen.tsx
+
+User flows to test:
+1. User views cart with items → taps "Checkout" → sees checkout form
+2. User fills shipping address → taps "Continue" → sees payment screen
+3. User enters payment details → taps "Pay Now" → sees confirmation
+4. User with empty cart → sees "Cart is empty" message
+
+=== EXECUTION ===
+After writing tests:
+1. Run on: [iOS Simulator - iPhone 15]
+2. Record videos: Yes
+3. Take screenshots: At each step
+4. Generate HTML report: Yes, save to ./reports/
+
+=== testIDs ===
+Known testIDs: [cart-screen, checkout-button, or "please discover"]
+Add missing testIDs: Yes, to any components that need them
+```
+
+### Template 3: Quick Single Feature Test with Report
+
+Use for testing one specific feature quickly:
+
+```
+Write and run E2E test for [LOGIN FEATURE] with HTML report.
+
+=== QUICK CONTEXT ===
+Framework: [React Native Expo]
+Screen file: [src/screens/LoginScreen.tsx]
+Navigation: User accesses login from welcome screen via "Sign In" button
+
+=== TEST THIS FLOW ===
+1. App launches → Welcome screen visible
+2. Tap "Sign In" → Login screen appears
+3. Enter email: test@example.com
+4. Enter password: password123
+5. Tap "Login" button
+6. Verify: Home screen appears with user greeting
+
+=== EXECUTION ===
+1. Discover/add testIDs if missing
+2. Write the test
+3. Build app (background)
+4. Run test with video recording
+5. Generate HTML report
+
+Device: [iPhone 15 Simulator]
+```
+
+### Template 4: Full App Test Suite with CI/CD
+
+Use for comprehensive coverage with automation:
+
+```
+Create complete E2E test suite with CI/CD pipeline.
+
+=== APP OVERVIEW ===
+App name: [MyApp]
+Type: [E-commerce / Social / Banking / Productivity]
+Framework: [React Native Expo]
+Project root: [/Users/me/projects/myapp]
+
+=== PROJECT STRUCTURE ===
+Screens: src/features/*/screens/
+Components: src/components/
+Navigation: src/navigation/AppNavigator.tsx
+API services: src/services/api/
+
+=== TEST COVERAGE NEEDED ===
+
+Authentication:
+- Login with email/password
+- Login with biometrics
+- Registration flow
+- Forgot password
+- Logout
+
+Main Features:
+- [Feature 1]: Browse products → View details → Add to cart
+- [Feature 2]: View cart → Update quantities → Remove items
+- [Feature 3]: Checkout → Enter address → Payment → Confirmation
+
+Settings:
+- Update profile
+- Change notification preferences
+- Dark mode toggle
+
+Edge Cases:
+- Offline mode behavior
+- Session expiration
+- Deep link handling: myapp://product/[id]
+
+=== EXECUTION PLAN ===
+1. Set up Detox (if not already)
+2. Discover all screens and testIDs
+3. Add missing testIDs to components
+4. Create test files organized by feature:
+   - e2e/flows/auth/
+   - e2e/flows/products/
+   - e2e/flows/cart/
+   - e2e/flows/checkout/
+   - e2e/flows/settings/
+5. Build app for both platforms
+6. Run full test suite
+7. Generate consolidated HTML report
+
+=== CI/CD ===
+Platform: [GitHub Actions]
+Triggers: [On PR to main, On push to main]
+Artifacts: Upload HTML report and videos
+
+=== DEVICES ===
+iOS: iPhone 15, iPhone 14
+Android: Pixel 4 API 33
+```
+
+### Template 5: Debug and Fix Failing Tests
+
+```
+Debug my failing E2E test and fix it.
+
+=== ERROR ===
+[Paste full error message here]
+
+=== TEST FILE ===
+Path: [e2e/flows/auth/login.test.ts]
+Test name: "should navigate to home after successful login"
+
+=== EXPECTED BEHAVIOR ===
+User enters credentials → taps login → home screen appears
+
+=== ACTUAL BEHAVIOR ===
+Test times out waiting for element with id "home-screen"
+
+=== RECENT CHANGES ===
+[What changed recently that might have caused this?]
+- Changed navigation structure
+- Renamed components
+- Updated testIDs
+
+=== WHAT I NEED ===
+1. Analyze the error
+2. Check if testIDs still exist in codebase
+3. Fix the test or the component
+4. Re-run the test
+5. Confirm it passes
+```
+
+### Key Context Checklist
+
+Always include these for best results:
+
+| Context | Why It Matters | Example |
+|---------|----------------|---------|
+| **Framework** | Determines testID syntax | `React Native Expo` |
+| **Project root** | Agent knows where files are | `/Users/me/projects/myapp` |
+| **Screens folder** | Where to find UI components | `src/features/*/screens/` |
+| **Navigation type** | How screens connect | `Expo Router with tabs` |
+| **User flows** | What to actually test | `Login → Home → Profile` |
+| **Devices** | Where to run tests | `iPhone 15, Pixel 4 API 33` |
+| **Output needs** | Reports, videos, CI | `HTML report with videos` |
+
+### Pro Tips
+
+1. **Be Specific About Paths**: `/Users/me/myapp/src/screens/` not just "my screens folder"
+
+2. **Describe Full User Flows**: "User opens app → taps Login → enters email → taps Submit → sees Home" not just "test login"
+
+3. **Mention What's Missing**: "No testIDs exist yet" helps the agent know to add them first
+
+4. **Specify Output Needs**: "Generate HTML report with videos" ensures you get the full artifacts
+
+5. **Include Device Targets**: "iPhone 15 and Pixel 4 API 33" avoids assumptions
+
+6. **Request the Full Workflow**: "Set up, write tests, run, and generate report" ensures nothing is skipped
+
+### Full E2E Flow Reminder
+
+The AI should execute this complete workflow:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  1. SETUP      │ Install Detox, create .detoxrc.js              │
+│  2. DISCOVER   │ Find screens, navigation, existing testIDs     │
+│  3. ADD IDs    │ Add testIDs to components that need them       │
+│  4. WRITE      │ Create test files with proper structure        │
+│  5. BUILD      │ Build app (background, 2-10 min)               │
+│  6. RUN        │ Execute tests (background, 5-30 min)           │
+│  7. REPORT     │ Generate HTML with videos/screenshots          │
+│  8. CI/CD      │ Set up automation (if requested)               │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## CRITICAL: Codebase Discovery Before Writing Tests
+
+**IMPORTANT:** Before writing ANY test cases, you MUST systematically discover the UI structure. Do NOT flood the terminal with large file dumps.
+
+### Step 1: Identify Screen Components (Targeted Search)
+
+```bash
+# Find screen/page components - use grep, don't cat entire files
+grep -rn "Screen\|Page\|View" --include="*.tsx" --include="*.jsx" src/ | head -30
+
+# Find existing testIDs in the codebase
+grep -rn "testID=" --include="*.tsx" --include="*.jsx" src/ | head -50
+
+# For iOS Swift projects
+grep -rn "accessibilityIdentifier" --include="*.swift" | head -30
+
+# For Android Compose
+grep -rn "testTag" --include="*.kt" | head -30
+```
+
+### Step 2: Map Navigation Structure
+
+```bash
+# Find navigation configuration
+grep -rn "Stack.Screen\|Tab.Screen\|createNativeStackNavigator" --include="*.tsx" src/
+
+# Find route definitions
+grep -rn "routes\|screens\|navigation" --include="*.ts" --include="*.tsx" src/navigation/ 2>/dev/null | head -20
+```
+
+### Step 3: Read Components Selectively
+
+**DO NOT** dump entire component files. Read only the sections you need:
+
+```bash
+# Read just the first 60 lines to see component structure
+head -60 src/screens/LoginScreen.tsx
+
+# Search for specific elements within a file
+grep -n "testID\|onPress\|Button\|Input\|Text" src/screens/LoginScreen.tsx
+```
+
+### Step 4: Create testID Inventory
+
+Before writing tests, create a mental map of existing testIDs:
+
+```bash
+# Export all testIDs to review
+grep -rhn "testID=\"[^\"]*\"" --include="*.tsx" src/ | sed 's/.*testID="\([^"]*\)".*/\1/' | sort -u
+```
+
+---
+
+## Handling Missing testIDs
+
+**Reality:** Most codebases have few or no testIDs. This is normal. Here's the workflow:
+
+### Step 1: Identify Components Without testIDs
+
+```bash
+# Find interactive elements WITHOUT testIDs
+grep -rn "onPress=\|onClick=\|<Button\|<TouchableOpacity\|<Pressable\|<TextInput" --include="*.tsx" src/ | grep -v "testID" | head -30
+
+# Find form inputs without testIDs
+grep -rn "<TextInput\|<Input" --include="*.tsx" src/ | grep -v "testID" | head -20
+```
+
+### Step 2: Add testIDs to Components
+
+**Before writing tests, ADD testIDs to the components you need to test.**
+
+#### React Native / Expo
+
+```tsx
+// BEFORE (no testID)
+<TextInput
+  placeholder="Email"
+  value={email}
+  onChangeText={setEmail}
+/>
+
+// AFTER (with testID)
+<TextInput
+  testID="login-email-input"
+  placeholder="Email"
+  value={email}
+  onChangeText={setEmail}
+/>
+```
+
+#### SwiftUI
+
+```swift
+// BEFORE
+TextField("Email", text: $email)
+
+// AFTER
+TextField("Email", text: $email)
+    .accessibilityIdentifier("login-email-input")
+```
+
+#### UIKit
+
+```swift
+// BEFORE
+let emailField = UITextField()
+
+// AFTER
+let emailField = UITextField()
+emailField.accessibilityIdentifier = "login-email-input"
+```
+
+#### Jetpack Compose
+
+```kotlin
+// BEFORE
+TextField(value = email, onValueChange = { email = it })
+
+// AFTER
+TextField(
+    value = email,
+    onValueChange = { email = it },
+    modifier = Modifier.testTag("login-email-input")
+)
+```
+
+#### Android XML
+
+```xml
+<!-- BEFORE -->
+<EditText
+    android:id="@+id/emailInput"
+    android:hint="Email" />
+
+<!-- AFTER -->
+<EditText
+    android:id="@+id/emailInput"
+    android:hint="Email"
+    android:contentDescription="login-email-input" />
+```
+
+### Step 3: testID Naming Convention
+
+Follow this pattern: `{screen}-{element}-{type}`
+
+| Element | testID Example |
+|---------|----------------|
+| Screen container | `login-screen` |
+| Email input | `login-email-input` |
+| Password input | `login-password-input` |
+| Submit button | `login-submit-button` |
+| Error message | `login-error-text` |
+| List item (index) | `product-item-0`, `product-item-1` |
+| Toggle/Switch | `settings-notifications-toggle` |
+
+### Step 4: Fallback Matchers (When testIDs Can't Be Added)
+
+If you cannot modify the source code, use alternative matchers:
+
+```typescript
+// By visible text (less stable, but works)
+element(by.text('Sign In'))
+element(by.text('Submit'))
+
+// By accessibility label
+element(by.label('Email input field'))
+
+// By type (platform-specific, least recommended)
+element(by.type('RCTTextInput'))  // React Native
+element(by.type('UITextField'))   // iOS native
+
+// Combine matchers for specificity
+element(by.text('Submit').withAncestor(by.id('login-form')))
+```
+
+### Workflow Summary
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. DISCOVER: Find screens and existing testIDs             │
+│  2. IDENTIFY: Find elements that need testIDs               │
+│  3. ADD: Add testIDs to components (modify source files)    │
+│  4. VERIFY: Run quick grep to confirm testIDs are present   │
+│  5. WRITE: Now write the E2E tests                          │
+│  6. RUN: Execute tests in background                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Prompt Users for Missing testIDs
+
+When testIDs are missing, inform the user:
+
+```
+I found that [LoginScreen.tsx] has interactive elements without testIDs:
+- Email TextInput (line 45)
+- Password TextInput (line 52)
+- Login Button (line 60)
+
+I'll add the following testIDs:
+- login-email-input
+- login-password-input
+- login-submit-button
+
+[Proceed to edit the file and add testIDs]
+```
+
+---
+
+## CRITICAL: Background Execution Guidelines
+
+**IMPORTANT:** Long-running commands MUST run in background to prevent terminal flooding and crashes.
+
+### Commands That MUST Run in Background
+
+| Command Type | Why Background | Example |
+|--------------|----------------|---------|
+| `detox build` | Takes 2-10 minutes | Build iOS/Android app |
+| `detox test` | Takes 5-30+ minutes | Run full test suite |
+| `npx expo prebuild` | Takes 1-5 minutes | Generate native projects |
+| `pod install` | Takes 1-3 minutes | Install iOS dependencies |
+| `./gradlew assembleDebug` | Takes 2-10 minutes | Build Android |
+
+### How to Run in Background
+
+```typescript
+// When using Bash tool, set run_in_background: true
+{
+  "command": "npx detox build --configuration ios.sim.debug",
+  "run_in_background": true,
+  "description": "Build iOS app for testing"
+}
+```
+
+### Monitoring Background Tasks
+
+```bash
+# Check if build is still running
+ps aux | grep -E "detox|xcodebuild|gradle" | grep -v grep
+
+# Check background task output periodically (use TaskOutput tool)
+# Do NOT repeatedly poll - check every 30-60 seconds
+```
+
+### Test Execution Strategy
+
+```bash
+# WRONG: Running all tests inline (will flood terminal)
+npx detox test --configuration ios.sim.debug
+
+# CORRECT: Run in background, check results later
+# Use run_in_background: true, then use TaskOutput to get results
+```
+
+---
+
+## CRITICAL: Terminal Efficiency Rules
+
+1. **NEVER** cat/read entire large files - use head, grep, or targeted line ranges
+2. **NEVER** run builds inline - always use background execution
+3. **NEVER** dump test output to terminal - capture to file or run in background
+4. **ALWAYS** use `| head -N` when output might be large
+5. **ALWAYS** use targeted searches instead of reading entire directories
+6. **LIMIT** grep results with `| head -30` or `| head -50`
+
+### Safe Patterns
+
+```bash
+# Safe: Limited output
+ls src/screens/ | head -20
+grep -rn "testID" src/ | head -30
+head -60 src/screens/LoginScreen.tsx
+
+# Unsafe: Can flood terminal
+cat src/screens/LoginScreen.tsx          # Could be 500+ lines
+find . -name "*.tsx" -exec cat {} \;     # Dumps everything
+npx detox test                            # Long output, run in background
+```
+
+---
+
 ## CRITICAL: Naming Conventions
 
 ### 1. Test File Naming
@@ -30,24 +590,24 @@ A comprehensive, production-ready framework for end-to-end mobile testing using 
 e2e/
 ├── flows/                          # Feature-based organization
 │   ├── auth/
-│   │   ├── login-flow.test.ts           ✅ Descriptive: "login-flow"
-│   │   ├── registration-flow.test.ts    ✅ Descriptive: "registration-flow"
-│   │   ├── password-reset.test.ts       ✅ Descriptive: "password-reset"
-│   │   ├── biometric-auth.test.ts       ✅ Descriptive: "biometric-auth"
-│   │   └── test1.test.ts                ❌ NEVER: Generic names
+│   │   ├── login-flow.test.ts           [OK] Descriptive: "login-flow"
+│   │   ├── registration-flow.test.ts    [OK] Descriptive: "registration-flow"
+│   │   ├── password-reset.test.ts       [OK] Descriptive: "password-reset"
+│   │   ├── biometric-auth.test.ts       [OK] Descriptive: "biometric-auth"
+│   │   └── test1.test.ts                [NO] NEVER: Generic names
 │   ├── onboarding/
-│   │   ├── welcome-carousel.test.ts     ✅ Good
-│   │   └── permissions-request.test.ts  ✅ Good
+│   │   ├── welcome-carousel.test.ts     [OK] Good
+│   │   └── permissions-request.test.ts  [OK] Good
 │   ├── profile/
-│   │   ├── profile-view.test.ts         ✅ Good
-│   │   ├── profile-edit.test.ts         ✅ Good
-│   │   └── avatar-upload.test.ts        ✅ Good
+│   │   ├── profile-view.test.ts         [OK] Good
+│   │   ├── profile-edit.test.ts         [OK] Good
+│   │   └── avatar-upload.test.ts        [OK] Good
 │   ├── settings/
-│   │   ├── notification-prefs.test.ts   ✅ Good
-│   │   └── theme-switching.test.ts      ✅ Good
+│   │   ├── notification-prefs.test.ts   [OK] Good
+│   │   └── theme-switching.test.ts      [OK] Good
 │   └── search/
-│       ├── search-flow.test.ts          ✅ Good
-│       └── filter-results.test.ts       ✅ Good
+│       ├── search-flow.test.ts          [OK] Good
+│       └── filter-results.test.ts       [OK] Good
 ├── smoke/                          # Quick sanity checks
 │   └── critical-path.test.ts
 ├── regression/                     # Full regression suite
@@ -68,7 +628,7 @@ e2e/
 ```typescript
 // PATTERN: {screen}-{element}-{type}
 
-// ✅ GOOD testID patterns
+// GOOD testID patterns:
 testID="login-screen"                    // Screen identifier
 testID="login-email-input"               // Input field
 testID="login-password-input"            // Input field
@@ -95,7 +655,7 @@ testID="nav-settings-tab"                // Tab bar item
 testID="header-back-button"              // Navigation button
 testID="header-menu-button"              // Header action
 
-// ❌ BAD testID patterns
+// BAD testID patterns (avoid):
 testID="btn1"                            // Not descriptive
 testID="input"                           // Too generic
 testID="test"                            // Meaningless
@@ -105,7 +665,7 @@ testID="asdf"                            // Random characters
 ### 3. Test Suite & Case Naming
 
 ```typescript
-// ✅ CORRECT: Names that are meaningful in reports
+// CORRECT: Names that are meaningful in reports
 describe('User Authentication - Login Flow', () => {
   it('should display welcome screen with login and register options', async () => {});
   it('should navigate to login screen when tapping Sign In', async () => {});
@@ -122,7 +682,7 @@ describe('User Profile - Edit Profile', () => {
   it('should save changes successfully', async () => {});
 });
 
-// ❌ WRONG: Useless in reports
+// WRONG: Useless in reports (avoid)
 describe('Tests', () => {
   it('test 1', async () => {});           // What is this testing?
   it('test 2', async () => {});           // Impossible to debug
@@ -145,19 +705,19 @@ describe('Tests', () => {
                     Generated: 2025-01-15 14:32:00
 ═══════════════════════════════════════════════════════════════
 
-✅ PASSED: User Authentication - Login Flow (4 tests, 12.3s)
-   ✓ should display welcome screen with login and register options (2.3s)
-   ✓ should navigate to login screen when tapping Sign In (1.8s)
-   ✓ should show inline validation error for invalid email format (1.2s)
-   ✓ should navigate to home screen after successful authentication (7.0s)
+[PASS] User Authentication - Login Flow (4 tests, 12.3s)
+   [+] should display welcome screen with login and register options (2.3s)
+   [+] should navigate to login screen when tapping Sign In (1.8s)
+   [+] should show inline validation error for invalid email format (1.2s)
+   [+] should navigate to home screen after successful authentication (7.0s)
 
-✅ PASSED: User Profile - Edit Profile (3 tests, 8.1s)
-   ✓ should display current profile information (2.1s)
-   ✓ should allow editing display name (1.5s)
-   ✓ should save changes successfully (4.5s)
+[PASS] User Profile - Edit Profile (3 tests, 8.1s)
+   [+] should display current profile information (2.1s)
+   [+] should allow editing display name (1.5s)
+   [+] should save changes successfully (4.5s)
 
-❌ FAILED: Search - Filter Results (1 test failed)
-   ✗ should display filtered results matching criteria (3.2s)
+[FAIL] Search - Filter Results (1 test failed)
+   [-] should display filtered results matching criteria (3.2s)
 
      Error: Element not found
      Matcher: by.id("search-results-list")
@@ -1634,7 +2194,10 @@ expect(element).not.toBeVisible()
 expect(element).toHaveText('text')
 expect(element).toHaveLabel('label')
 expect(element).toHaveId('id')
+expect(element).toHaveValue('value')
 expect(element).toBeFocused()
+expect(element).toHaveSliderPosition(0.5, 0.1)  // position, tolerance
+expect(element).toHaveToggleValue(true)         // toggle/switch state
 ```
 
 ### waitFor
@@ -1668,6 +2231,10 @@ device.matchFinger()
 device.setOrientation('landscape')
 device.openURL({ url: 'myapp://path' })
 device.sendUserNotification({ ... })
+device.tap({ x: 100, y: 200 })        // Tap at coordinates (v20+)
+device.longPress({ x: 100, y: 200 })  // Long press at coordinates (v20+)
+device.generateViewHierarchyXml()    // Get XML for debugging
+device.getUiDevice()                  // Android UiAutomator access
 ```
 
 ---
@@ -1679,7 +2246,259 @@ device.sendUserNotification({ ... })
 - `references/pilot-setup.md` - AI-powered testing with Wix Pilot
 - `references/ci-workflows.md` - GitHub Actions, CircleCI, Bitrise
 - `scripts/run-e2e.sh` - Automated test runner script
-- `scripts/generate-report.js` - HTML report generator
+- `scripts/generate-report.js` - Standalone HTML report generator
+- `scripts/report-hub.js` - Consolidated dashboard for multiple test sessions
+
+---
+
+## Example Test Files
+
+The skill includes comprehensive example tests covering common app patterns:
+
+### Authentication Examples
+| File | Description |
+|------|-------------|
+| `login-flow.test.ts` | Complete login flow with validation and navigation |
+| `registration-flow.test.ts` | User registration with email verification |
+| `password-reset.test.ts` | Password reset via email and security questions |
+| `two-factor-auth.test.ts` | SMS, TOTP, and backup code verification |
+
+### Navigation Examples
+| File | Description |
+|------|-------------|
+| `tab-navigation.test.ts` | Bottom tab bar, state persistence, badges |
+| `drawer-navigation.test.ts` | Hamburger menu, nested sections, logout |
+| `deep-linking.test.ts` | URL schemes, universal links, auth-required links |
+
+### Form and Search Examples
+| File | Description |
+|------|-------------|
+| `form-validation.test.ts` | Real-time validation, password strength, submission |
+| `search-filter.test.ts` | Search, suggestions, filters, sorting, history |
+
+### Media Examples
+| File | Description |
+|------|-------------|
+| `video-player.test.ts` | Playback controls, fullscreen, quality, subtitles |
+| `audio-player.test.ts` | Music player, shuffle/repeat, queue, background |
+| `image-gallery.test.ts` | Grid view, zoom, albums, selection mode |
+
+### Productivity Examples
+| File | Description |
+|------|-------------|
+| `calendar-scheduling.test.ts` | Views, events, reminders, recurring |
+| `file-management.test.ts` | Browsing, folders, uploads, file actions |
+| `notes-editor.test.ts` | Rich text, organization, tags, search |
+
+### Settings Examples
+| File | Description |
+|------|-------------|
+| `user-settings.test.ts` | Profile, account, preferences, privacy |
+| `notification-settings.test.ts` | Push, email, DND, sound/vibration |
+
+### Domain-Specific Examples
+| File | Description |
+|------|-------------|
+| `e-commerce.test.ts` | Product browsing, cart, checkout, orders |
+| `social-media.test.ts` | Feed, posts, stories, profiles, interactions |
+| `messaging-chat.test.ts` | Conversations, real-time, media, typing indicators |
+| `onboarding-tutorial.test.ts` | Carousels, permissions, personalization |
+| `gaming-entertainment.test.ts` | Menus, IAP, leaderboards, achievements |
+| `banking-finance.test.ts` | Accounts, transactions, transfers, bill pay |
+| `fitness-tracker.test.ts` | Activity tracking, workouts, goals, health |
+| `maps-location.test.ts` | Map views, search, directions, places |
+
+### Special Topics
+| File | Description |
+|------|-------------|
+| `permissions.test.ts` | Camera, location, notifications, biometrics |
+| `advanced-features.test.ts` | Deep links, offline mode, background states |
+| `accessibility.test.ts` | Screen reader, dynamic type, contrast, focus |
+
+---
+
+## Report Hub - Consolidated Test Dashboard
+
+Instead of generating separate reports for each test run, use the **Report Hub** to create a single dashboard where QAs can browse all test sessions.
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| **Session Navigation** | Side menu lists all test runs by date/feature |
+| **Append Mode** | New test runs are added to existing hub |
+| **Pass Rate Trends** | Visual chart showing trends across runs |
+| **Test Filtering** | Filter by passed/failed/all within sessions |
+| **Video Playback** | Embedded video player for recordings |
+| **Screenshot Gallery** | Lightbox viewer for all screenshots |
+| **Search** | Search across sessions by name |
+| **Export** | Export individual sessions as JSON |
+| **Dark/Light Mode** | Theme toggle with system preference detection |
+
+### Usage
+
+```bash
+# First run - creates new hub
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Login Flow"
+
+# Subsequent runs - appends to existing hub
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Checkout Flow"
+node scripts/report-hub.js --artifacts ./artifacts --hub ./report-hub --session "Registration"
+
+# Each run adds a new session to the sidebar navigation
+```
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--artifacts` | Path to Detox artifacts directory | `./e2e/artifacts` |
+| `--hub` | Path to report hub output directory | `./report-hub` |
+| `--session` | Session name (appears in sidebar) | Timestamp |
+| `--project` | Project name for dashboard header | "E2E Test Hub" |
+
+### Directory Structure
+
+```
+report-hub/
+├── index.html          # Main dashboard (auto-regenerated)
+├── data/
+│   ├── login-flow.json
+│   ├── checkout-flow.json
+│   └── registration.json
+└── assets/
+    ├── login-flow_video.mp4
+    ├── login-flow_screenshot.png
+    └── ...
+```
+
+### QA Workflow
+
+1. **Run tests by feature area**: `npx detox test e2e/flows/auth/`
+2. **Add to hub**: `node scripts/report-hub.js --session "Auth - Login"`
+3. **Run more tests**: `npx detox test e2e/flows/checkout/`
+4. **Append to hub**: `node scripts/report-hub.js --session "Checkout - Cart"`
+5. **Open hub**: Single `index.html` shows all sessions in sidebar
+
+### CI/CD Integration
+
+```yaml
+# Add to your CI workflow
+- name: Generate Report Hub
+  run: |
+    node scripts/report-hub.js \
+      --artifacts ./e2e/artifacts \
+      --hub ./report-hub \
+      --session "${{ github.run_id }}-${{ matrix.test-suite }}" \
+      --project "MyApp E2E Tests"
+
+- name: Upload Report Hub
+  uses: actions/upload-artifact@v4
+  with:
+    name: e2e-report-hub
+    path: report-hub/
+```
+
+---
+
+## Detox Copilot - Built-in Natural Language Testing
+
+Detox Copilot is a newer alternative to Wix Pilot that's built directly into Detox. It uses LLMs to interpret natural language instructions and translate them into Detox actions.
+
+### Key Advantages
+
+| Feature | Benefit |
+|---------|---------|
+| **Built-in** | No additional installation - part of Detox |
+| **LLM-Agnostic** | Works with GPT, Gemini, Claude, or any LLM |
+| **Lower Maintenance** | Tests less brittle to UI changes |
+| **Team Collaboration** | Non-technical team members can understand tests |
+
+### Setup
+
+```typescript
+// e2e/setup.ts
+const { copilot } = require('detox');
+
+// Create a prompt handler for your LLM
+class OpenAIPromptHandler {
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+  }
+
+  async runPrompt(prompt, image) {
+    // Send prompt to OpenAI API and return response
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4-vision-preview',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    return (await response.json()).choices[0].message.content;
+  }
+}
+
+beforeAll(() => {
+  const promptHandler = new OpenAIPromptHandler(process.env.OPENAI_API_KEY);
+  copilot.init(promptHandler);
+});
+```
+
+### Writing Tests with Copilot
+
+```typescript
+describe('Shopping Flow', () => {
+  it('should add product to cart', async () => {
+    await copilot.perform(
+      'Navigate to the "Products" page',
+      'Tap on the "Add to Cart" button for the first product',
+      'Verify that the cart badge shows "1"'
+    );
+  });
+
+  it('should complete checkout', async () => {
+    await copilot.perform(
+      'Open the cart',
+      'Tap "Proceed to Checkout"',
+      'Fill in the shipping address form',
+      'Confirm the order',
+      'Verify order confirmation message is displayed'
+    );
+  });
+});
+```
+
+### When to Use Copilot vs Traditional Tests
+
+| Use Case | Recommendation |
+|----------|----------------|
+| Quick prototyping | Copilot |
+| CI/CD pipelines | Traditional (more deterministic) |
+| Complex assertions | Traditional |
+| Cross-team collaboration | Copilot |
+| Performance-critical | Traditional |
+
+---
+
+## Additional Ideas for Enhancement
+
+Future improvements that can be added to this skill:
+
+| Idea | Description | Complexity |
+|------|-------------|------------|
+| **Test Coverage Map** | Visual diagram showing which screens have E2E coverage | Medium |
+| **Flaky Test Detection** | Track tests that intermittently fail across runs | Medium |
+| **Performance Trending** | Chart execution times over multiple runs | Low |
+| **Screenshot Diff** | Compare screenshots between runs to detect UI regressions | High |
+| **Slack Integration** | Send test summaries to Slack/Teams channels | Low |
+| **Test Prioritization** | AI-powered suggestions for which tests to run based on code changes | High |
+| **Parallel Test Runner** | Split tests across multiple simulators/emulators | Medium |
+| **Device Farm Integration** | Connect to AWS Device Farm or Firebase Test Lab | High |
 
 ---
 
@@ -1687,6 +2506,8 @@ device.sendUserNotification({ ... })
 
 - [Detox Documentation](https://wix.github.io/Detox/)
 - [Detox GitHub](https://github.com/wix/Detox)
-- [Wix Pilot (AI Testing)](https://github.com/wix-incubator/pilot)
+- [Detox Copilot Guide](https://wix.github.io/Detox/docs/copilot/testing-with-copilot) - Built-in natural language testing
+- [Wix Pilot (AI Testing)](https://github.com/wix-incubator/pilot) - Alternative AI test generation
 - [Detox Instruments](https://github.com/wix-incubator/DetoxInstruments)
 - [Firebase DebugView](https://firebase.google.com/docs/analytics/debugview)
+- [Lucide Icons](https://lucide.dev/) - Icons used in HTML reports
