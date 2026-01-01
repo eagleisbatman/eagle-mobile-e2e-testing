@@ -182,9 +182,40 @@ build_app() {
   fi
 }
 
+start_metro() {
+  log_step "Starting Metro Bundler"
+
+  # Check if Metro is already running
+  if lsof -i :8081 >/dev/null 2>&1; then
+    log_info "Metro bundler already running on port 8081"
+    return 0
+  fi
+
+  # Start Metro in background
+  log_info "Starting Metro bundler..."
+  npx expo start --clear > "$ARTIFACTS_DIR/logs/metro.log" 2>&1 &
+  METRO_PID=$!
+
+  # Wait for Metro to be ready
+  log_info "Waiting for Metro to be ready..."
+  local max_attempts=30
+  local attempt=0
+  while [ $attempt -lt $max_attempts ]; do
+    if lsof -i :8081 >/dev/null 2>&1; then
+      log_success "Metro bundler started (PID: $METRO_PID)"
+      return 0
+    fi
+    sleep 1
+    attempt=$((attempt + 1))
+  done
+
+  log_error "Metro bundler failed to start within 30 seconds"
+  exit 1
+}
+
 start_device() {
   log_step "Starting Device"
-  
+
   if [ "$PLATFORM" = "ios" ]; then
     # Boot iOS simulator
     local simulator_name=$(grep -A2 "simulator:" .detoxrc.js 2>/dev/null | grep "type:" | head -1 | sed "s/.*'\(.*\)'.*/\1/" || echo "iPhone 15")
@@ -331,7 +362,12 @@ print_summary() {
 
 cleanup() {
   log_info "Cleaning up..."
-  # Add any cleanup tasks here
+
+  # Stop Metro bundler if we started it
+  if [ -n "$METRO_PID" ]; then
+    log_info "Stopping Metro bundler (PID: $METRO_PID)..."
+    kill $METRO_PID 2>/dev/null || true
+  fi
 }
 
 # =============================================================================
@@ -356,6 +392,7 @@ main() {
   setup_directories
   discover_tests
   build_app
+  start_metro
   start_device
   
   # Run tests and capture exit code
