@@ -1436,14 +1436,14 @@ function generateHTML(tests, config) {
         \`;
       }
 
-      if (test.steps && test.steps.length > 0) {
+      if (test.steps && test.steps.length > 0 && typeof test.steps[0] === 'object') {
         html += \`
           <div class="steps-section">
-            <div class="section-title"><i data-lucide="list-checks" style="width:16px;height:16px;display:inline;vertical-align:-3px;"></i> Test Steps</div>
+            <div class="section-title"><i data-lucide="list-checks" style="width:16px;height:16px;display:inline;vertical-align:-3px;"></i> Execution Log</div>
             <div class="steps-timeline">
               \${test.steps.map(step => \`
                 <div class="step-item \${step.status || 'success'}">
-                  <div class="step-action">\${step.action}</div>
+                  <div class="step-action">\${step.action || ''}</div>
                   \${step.detail ? \`<div class="step-detail">\${step.detail}</div>\` : ''}
                 </div>
               \`).join('')}
@@ -1589,14 +1589,14 @@ function generateDetailPanel(test) {
     `;
   }
 
-  if (test.steps && test.steps.length > 0) {
+  if (test.steps && test.steps.length > 0 && typeof test.steps[0] === 'object') {
     html += `
       <div class="steps-section">
-        <div class="section-title"><i data-lucide="list-checks" style="width:16px;height:16px;display:inline;vertical-align:-3px;"></i> Test Steps</div>
+        <div class="section-title"><i data-lucide="list-checks" style="width:16px;height:16px;display:inline;vertical-align:-3px;"></i> Execution Log</div>
         <div class="steps-timeline">
           ${test.steps.map(step => `
             <div class="step-item ${step.status || 'success'}">
-              <div class="step-action">${step.action}</div>
+              <div class="step-action">${step.action || ''}</div>
               ${step.detail ? `<div class="step-detail">${step.detail}</div>` : ''}
             </div>
           `).join('')}
