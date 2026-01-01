@@ -539,6 +539,12 @@ function generateHTML(tests, config) {
       border-color: var(--accent-primary);
     }
 
+    [data-theme="dark"] .filter-btn.active {
+      background: hsl(240 3.7% 25%);
+      border-color: hsl(240 4.9% 83.9%);
+      color: hsl(0 0% 98%);
+    }
+
     .test-list {
       display: flex;
       flex-direction: column;
@@ -573,6 +579,10 @@ function generateHTML(tests, config) {
 
     .test-item.active .test-status { opacity: 0.9; box-shadow: 0 0 0 2px rgba(255,255,255,0.3); }
     .test-item.active .test-meta { color: rgba(255,255,255,0.75); }
+    .test-item.active .test-name { color: inherit; }
+
+    [data-theme="dark"] .test-item.active .test-meta { color: hsl(240 5% 64.9%); }
+    [data-theme="dark"] .test-item.active .test-name { color: hsl(0 0% 98%); }
 
     .test-item-header {
       display: flex;
