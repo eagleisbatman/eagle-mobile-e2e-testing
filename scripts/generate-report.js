@@ -1445,29 +1445,33 @@ function main() {
     fs.mkdirSync(mediaDir, { recursive: true });
   }
 
-  tests.forEach(test => {
-    // Copy videos
+  tests.forEach((test, testIndex) => {
+    // Copy videos with unique names based on test ID
     if (test.videos) {
-      test.videos.forEach(video => {
+      test.videos.forEach((video, videoIndex) => {
         if (fs.existsSync(video.path)) {
-          const destPath = path.join(mediaDir, path.basename(video.path));
+          const ext = path.extname(video.path);
+          const uniqueName = `test-${testIndex}-video-${videoIndex}${ext}`;
+          const destPath = path.join(mediaDir, uniqueName);
           try {
             fs.copyFileSync(video.path, destPath);
-            video.relativePath = `media/${path.basename(video.path)}`;
+            video.relativePath = `media/${uniqueName}`;
           } catch (e) {
             console.warn(`Failed to copy video: ${video.path}`);
           }
         }
       });
     }
-    // Copy screenshots
+    // Copy screenshots with unique names based on test ID
     if (test.screenshots) {
-      test.screenshots.forEach(screenshot => {
+      test.screenshots.forEach((screenshot, ssIndex) => {
         if (fs.existsSync(screenshot.path)) {
-          const destPath = path.join(mediaDir, path.basename(screenshot.path));
+          const ext = path.extname(screenshot.path);
+          const uniqueName = `test-${testIndex}-screenshot-${ssIndex}${ext}`;
+          const destPath = path.join(mediaDir, uniqueName);
           try {
             fs.copyFileSync(screenshot.path, destPath);
-            screenshot.relativePath = `media/${path.basename(screenshot.path)}`;
+            screenshot.relativePath = `media/${uniqueName}`;
           } catch (e) {
             console.warn(`Failed to copy screenshot: ${screenshot.path}`);
           }
