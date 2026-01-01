@@ -406,13 +406,13 @@ function generateHTML(tests, config) {
       top: 50%;
       transform: translateY(-50%);
       font-size: 14px;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease, color 0.3s ease;
     }
 
-    .theme-toggle .sun { left: 10px; opacity: 1; }
-    .theme-toggle .moon { right: 10px; opacity: 0.4; }
-    [data-theme="dark"] .theme-toggle .sun { opacity: 0.4; }
-    [data-theme="dark"] .theme-toggle .moon { opacity: 1; }
+    .theme-toggle .sun { left: 10px; opacity: 1; color: hsl(38 92% 50%); }
+    .theme-toggle .moon { right: 10px; opacity: 0.5; color: hsl(240 5% 64.9%); }
+    [data-theme="dark"] .theme-toggle .sun { opacity: 0.5; color: hsl(38 92% 50%); }
+    [data-theme="dark"] .theme-toggle .moon { opacity: 1; color: hsl(217 91% 60%); }
 
     /* Stats Grid */
     .stats-grid {
