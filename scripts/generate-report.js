@@ -82,6 +82,33 @@ function findFiles(dir, extensions) {
 /**
  * Scan artifacts directory for test results
  */
+/**
+ * Parse run directory name to extract platform metadata
+ * Format: ios.sim.debug.2026-01-01 05-58-13Z or android.emu.release.2026-01-01
+ */
+function parseRunMetadata(runDirName) {
+  const parts = runDirName.split('.');
+  if (parts.length < 3) return null;
+
+  const platform = parts[0].toLowerCase();
+  const deviceType = parts[1].toLowerCase();
+  const buildType = parts[2].toLowerCase();
+
+  return {
+    platform: platform === 'ios' ? 'iOS' : platform === 'android' ? 'Android' : platform,
+    deviceType: deviceType === 'sim' ? 'Simulator' : deviceType === 'emu' ? 'Emulator' : deviceType === 'device' ? 'Real Device' : deviceType,
+    buildType: buildType === 'debug' ? 'Debug' : buildType === 'release' ? 'Release' : buildType,
+    runId: runDirName
+  };
+}
+
+/**
+ * Check if directory name is a run directory (not a test directory)
+ */
+function isRunDirectory(dirName) {
+  return /^(ios|android)\.(sim|emu|device)\.(debug|release)\./i.test(dirName);
+}
+
 function scanArtifacts(artifactsDir) {
   const tests = [];
 
@@ -102,6 +129,21 @@ function scanArtifacts(artifactsDir) {
     const dir = path.dirname(filePath);
     const testName = path.basename(dir);
 
+    // Skip if this is a run directory (not a test directory)
+    if (isRunDirectory(testName)) {
+      return;
+    }
+
+    // Extract run metadata from parent directories
+    let runMetadata = null;
+    const pathParts = dir.split(path.sep);
+    for (const part of pathParts) {
+      if (isRunDirectory(part)) {
+        runMetadata = parseRunMetadata(part);
+        break;
+      }
+    }
+
     if (!testMap.has(testName)) {
       const metadata = loadTestCaseMetadata(dir);
       testMap.set(testName, {
@@ -113,6 +155,9 @@ function scanArtifacts(artifactsDir) {
         expectedResults: metadata?.expectedResults || [],
         priority: metadata?.priority || null,
         category: metadata?.category || null,
+        platform: runMetadata?.platform || null,
+        deviceType: runMetadata?.deviceType || null,
+        buildType: runMetadata?.buildType || null,
         directory: dir,
         videos: [],
         screenshots: [],
@@ -711,6 +756,13 @@ function generateHTML(tests, config) {
     .badge.duration { background: var(--bg-tertiary); color: var(--text-secondary); text-transform: none; }
     .badge.priority { background: hsl(262 83% 58% / 0.15); color: hsl(262 83% 58%); }
     .badge.category { background: hsl(199 89% 48% / 0.15); color: hsl(199 89% 48%); }
+    .badge.platform-ios { background: hsl(0 0% 0% / 0.1); color: var(--text-primary); }
+    .badge.platform-android { background: hsl(141 71% 48% / 0.15); color: hsl(141 71% 38%); }
+    .badge.device-type { background: hsl(220 14% 46% / 0.15); color: hsl(220 14% 46%); }
+    .badge.build-type { background: hsl(38 92% 50% / 0.15); color: hsl(38 92% 40%); }
+
+    [data-theme="dark"] .badge.platform-ios { background: hsl(0 0% 100% / 0.1); }
+    [data-theme="dark"] .badge.platform-android { background: hsl(141 71% 48% / 0.2); color: hsl(141 71% 58%); }
 
     /* Test Description */
     .test-description {
@@ -1360,6 +1412,8 @@ function generateHTML(tests, config) {
             \${test.description ? \`<p class="test-description">\${test.description}</p>\` : ''}
             <div class="detail-badges">
               <span class="badge \${test.status}">\${test.status.toUpperCase()}</span>
+              \${test.platform ? \`<span class="badge platform-\${test.platform.toLowerCase()}">\${test.platform}</span>\` : ''}
+              \${test.deviceType ? \`<span class="badge device-type">\${test.deviceType}</span>\` : ''}
               \${test.priority ? \`<span class="badge priority">\${test.priority}</span>\` : ''}
               \${test.category ? \`<span class="badge category">\${test.category}</span>\` : ''}
               \${test.duration ? \`<span class="badge duration"><i data-lucide="clock" style="width:12px;height:12px;display:inline;vertical-align:-2px;"></i> \${formatDuration(test.duration)}</span>\` : ''}
@@ -1513,6 +1567,8 @@ function generateDetailPanel(test) {
         ${test.description ? `<p class="test-description">${test.description}</p>` : ''}
         <div class="detail-badges">
           <span class="badge ${test.status}">${test.status.toUpperCase()}</span>
+          ${test.platform ? `<span class="badge platform-${test.platform.toLowerCase()}">${test.platform}</span>` : ''}
+          ${test.deviceType ? `<span class="badge device-type">${test.deviceType}</span>` : ''}
           ${test.priority ? `<span class="badge priority">${test.priority}</span>` : ''}
           ${test.category ? `<span class="badge category">${test.category}</span>` : ''}
           ${test.duration ? `<span class="badge duration"><i data-lucide="clock" style="width:12px;height:12px;display:inline;vertical-align:-2px;"></i> ${formatDuration(test.duration)}</span>` : ''}
