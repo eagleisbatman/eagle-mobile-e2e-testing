@@ -360,18 +360,6 @@ function generateHTML(tests, config) {
       gap: 1rem;
     }
 
-    .logo-icon {
-      width: 52px;
-      height: 52px;
-      background: var(--accent-gradient);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.75rem;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    }
-
     .logo-text h1 {
       font-size: 1.5rem;
       font-weight: 700;
@@ -1066,7 +1054,6 @@ function generateHTML(tests, config) {
     <header class="header">
       <div class="header-top">
         <div class="logo">
-          <div class="logo-icon"><i data-lucide="bird" style="width:28px;height:28px;color:white;"></i></div>
           <div class="logo-text">
             <h1>${config.projectName}</h1>
             <p>Generated ${timestamp}</p>
