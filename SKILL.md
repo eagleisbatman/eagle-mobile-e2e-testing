@@ -2485,6 +2485,153 @@ describe('Shopping Flow', () => {
 
 ---
 
+## Vision-Enhanced Testing with Gemini
+
+Take E2E testing to the next level with AI vision capabilities. Instead of relying solely on testIDs and view hierarchy, use Gemini's visual understanding to:
+
+- **See what's on screen** and make intelligent decisions
+- **Self-correct when lost** by analyzing the current visual state
+- **Discover elements** without predefined testIDs
+- **Validate visual correctness** (not just element presence)
+
+### Model Selection
+
+| Model | Model ID | Speed | Best For |
+|-------|----------|-------|----------|
+| **Gemini 3 Flash** | `gemini-3-flash` | Fastest | **Recommended** - best balance |
+| **Gemini 2.5 Flash** | `gemini-2.5-flash` | Fast | Thinking capabilities |
+| **Gemini 2.5 Pro** | `gemini-2.5-pro` | Medium | Complex reasoning |
+
+### Installation
+
+```bash
+# New Google Gen AI SDK (replaces @google/generative-ai)
+npm install --save-dev @google/genai
+
+# Set your API key
+export GEMINI_API_KEY=your_api_key
+```
+
+### Vision Prompt Handler
+
+```typescript
+// e2e/handlers/GeminiVisionHandler.ts
+import { GoogleGenAI } from '@google/genai';
+import { PromptHandler } from '@wix-pilot/core';
+
+export class GeminiVisionHandler implements PromptHandler {
+  private ai: GoogleGenAI;
+  private model: string;
+
+  constructor(apiKey: string, model = 'gemini-3-flash') {
+    this.ai = new GoogleGenAI({ apiKey });
+    this.model = model;
+  }
+
+  async runPrompt(prompt: string, image?: string): Promise<string> {
+    const parts: any[] = [];
+
+    if (image) {
+      parts.push({
+        inlineData: { mimeType: 'image/png', data: image },
+      });
+    }
+
+    parts.push({ text: this.getSystemPrompt() + '\n\n' + prompt });
+
+    const response = await this.ai.models.generateContent({
+      model: this.model,
+      contents: [{ role: 'user', parts }],
+      config: { temperature: 0.2 },
+    });
+
+    return response.text || '';
+  }
+
+  private getSystemPrompt(): string {
+    return `You are a mobile app tester with VISION. Base decisions on what you SEE.
+
+Respond with JSON:
+{
+  "observation": "What you see",
+  "currentState": "screen_name",
+  "action": { "type": "tap|type|scroll|none", "target": "element", "value": "text" },
+  "confidence": "high|medium|low"
+}`;
+  }
+
+  isSnapshotImageSupported(): boolean {
+    return true;
+  }
+}
+```
+
+### Goal-Based Testing
+
+```typescript
+// e2e/vision-tests/checkout.test.ts
+import { device } from 'detox';
+import { VisionTestRunner } from '../VisionTestRunner';
+
+describe('Vision-Enhanced Checkout', () => {
+  let runner: VisionTestRunner;
+
+  beforeAll(async () => {
+    await device.launchApp({ newInstance: true });
+    runner = new VisionTestRunner({
+      apiKey: process.env.GEMINI_API_KEY!,
+      model: 'gemini-3-flash',
+    });
+  });
+
+  it('should complete checkout using vision', async () => {
+    const result = await runner.executeGoal(
+      'Add item to cart, go to checkout, and complete purchase. ' +
+      'Goal is achieved when confirmation screen appears.',
+      { maxSteps: 20 }
+    );
+
+    expect(result.success).toBe(true);
+    console.log(`Completed in ${result.steps.length} steps`);
+  });
+});
+```
+
+### Video Analysis (Experimental)
+
+Analyze recorded test videos for issues, regressions, and quality:
+
+```typescript
+import { VideoTestRunner } from '../VideoTestRunner';
+
+const analyzer = new VideoTestRunner(process.env.GEMINI_API_KEY!, 'gemini-2.5-flash');
+
+// Analyze a recorded test
+const analysis = await analyzer.analyzeVideo('./artifacts/test.mp4');
+console.log('Screens visited:', analysis.screensVisited);
+console.log('Issues found:', analysis.issuesFound);
+console.log('UI Quality:', analysis.visualQuality.rating);
+
+// Compare with baseline for regression detection
+const comparison = await analyzer.compareVideos(
+  './baselines/checkout.mp4',
+  './current/checkout.mp4'
+);
+expect(comparison.regressions).toHaveLength(0);
+```
+
+### Cost Estimation
+
+| Test Type | Steps | Gemini 3 Flash | Gemini 2.5 Pro |
+|-----------|-------|----------------|----------------|
+| Simple flow | 10 | ~$0.02 | ~$0.10 |
+| Medium flow | 20 | ~$0.04 | ~$0.20 |
+| Exploration | 50 | ~$0.10 | ~$0.50 |
+
+For complete implementation details, see [references/vision-testing.md](references/vision-testing.md).
+
+---
+
 ## Additional Ideas for Enhancement
 
 Future improvements that can be added to this skill:
@@ -2511,3 +2658,5 @@ Future improvements that can be added to this skill:
 - [Detox Instruments](https://github.com/wix-incubator/DetoxInstruments)
 - [Firebase DebugView](https://firebase.google.com/docs/analytics/debugview)
 - [Lucide Icons](https://lucide.dev/) - Icons used in HTML reports
+- [Google Gen AI SDK](https://github.com/googleapis/js-genai) - Vision-enhanced testing with Gemini
+- [Gemini API Documentation](https://ai.google.dev/gemini-api/docs) - Model capabilities and pricing

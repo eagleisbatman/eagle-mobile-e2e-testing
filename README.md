@@ -38,6 +38,7 @@
 | ◉ | **Universal Platform Support** | Single skill for React Native, iOS native, and Android native apps |
 | ◉ | **Multi-Agent Compatible** | Works with Claude Code, Codex, Cursor, Copilot, and 20+ AI tools |
 | ◉ | **AI-Powered Testing** | Generate tests from natural language using Wix Pilot |
+| ◉ | **Vision-Enhanced Testing** | Goal-based testing with Gemini vision - self-correcting and testID-independent |
 | ◉ | **Rich Artifacts** | Video recordings, screenshots, logs, and timeline traces for every test |
 | ◉ | **Beautiful Reports** | Modern HTML reports with dark/light mode and video playback |
 | ◉ | **Advanced Scenarios** | Biometrics, deep links, permissions, offline mode, network mocking |
@@ -413,6 +414,38 @@ await device.launchApp({ newInstance: false });
 // Verify app state restored correctly
 await expect(element(by.id('home-screen'))).toBeVisible();
 ```
+</details>
+
+<details>
+<summary><b>Vision-Enhanced Testing with Gemini</b></summary>
+
+Use AI vision to intelligently navigate and test your app:
+
+```typescript
+import { VisionTestRunner } from '../VisionTestRunner';
+
+// Initialize with Gemini 3 Flash (fastest, best value)
+const runner = new VisionTestRunner({
+  apiKey: process.env.GEMINI_API_KEY!,
+  model: 'gemini-3-flash',
+});
+
+// Goal-based testing - AI figures out how to achieve the goal
+const result = await runner.executeGoal(
+  'Log in with email "test@example.com" and password "Test123!"',
+  { maxSteps: 15 }
+);
+
+expect(result.success).toBe(true);
+```
+
+**Key Features:**
+- Self-correcting when lost
+- Works without testIDs (uses visual element detection)
+- Video analysis for regression detection
+- Exploratory testing for discovering issues
+
+See [references/vision-testing.md](references/vision-testing.md) for complete documentation.
 </details>
 
 ---
