@@ -419,18 +419,17 @@ await expect(element(by.id('home-screen'))).toBeVisible();
 <details>
 <summary><b>Vision-Enhanced Testing with Gemini</b></summary>
 
-Use AI vision to intelligently navigate and test your app:
+Use AI vision to intelligently navigate and test your app. See the dedicated **[Vision Testing](#vision-testing)** section below for complete documentation.
 
 ```typescript
-import { VisionTestRunner } from '../VisionTestRunner';
+import { VisionTestRunner, GeminiVisionHandler } from 'eagle-mobile-e2e-testing';
 
-// Initialize with Gemini 3 Flash (fastest, best value)
+// Goal-based testing - AI figures out how to achieve the goal
 const runner = new VisionTestRunner({
   apiKey: process.env.GEMINI_API_KEY!,
   model: 'gemini-3-flash',
 });
 
-// Goal-based testing - AI figures out how to achieve the goal
 const result = await runner.executeGoal(
   'Log in with email "test@example.com" and password "Test123!"',
   { maxSteps: 15 }
@@ -438,15 +437,154 @@ const result = await runner.executeGoal(
 
 expect(result.success).toBe(true);
 ```
-
-**Key Features:**
-- Self-correcting when lost
-- Works without testIDs (uses visual element detection)
-- Video analysis for regression detection
-- Exploratory testing for discovering issues
-
-See [references/vision-testing.md](references/vision-testing.md) for complete documentation.
 </details>
+
+---
+
+## Vision Testing
+
+Eagle includes a powerful vision testing system powered by **Google Gemini** models. This enables intelligent, self-correcting tests that can navigate apps visually without relying solely on testIDs.
+
+### Why Vision Testing?
+
+| Problem | Vision Solution |
+|---------|-----------------|
+| Tests break when testIDs change | Visual element detection works regardless of IDs |
+| Tests get "lost" after navigation | Self-correcting: analyzes screen and recovers |
+| Shallow test coverage | Autonomous exploration discovers all screens |
+| No visual validation | Screenshot comparison detects regressions |
+| Accessibility is an afterthought | Built-in WCAG compliance auditing |
+
+### Quick Start
+
+```bash
+# Install dependencies
+npm install @google/genai
+
+# Set your Gemini API key
+export GEMINI_API_KEY=your_api_key
+```
+
+### Core Modules
+
+Import from the `src/` directory:
+
+```typescript
+import {
+  // Handlers
+  GeminiVisionHandler,
+
+  // Runners
+  VisionTestRunner,
+  VideoTestRunner,
+  AppExplorer,
+
+  // Utilities
+  VisualRegression,
+  VisionReportGenerator,
+} from './src';
+```
+
+### Usage Examples
+
+#### Goal-Based Testing
+
+```typescript
+import { VisionTestRunner } from './src';
+
+const runner = new VisionTestRunner({
+  apiKey: process.env.GEMINI_API_KEY!,
+  model: 'gemini-3-flash', // Fast and cost-effective
+});
+
+// AI figures out how to achieve the goal
+const result = await runner.executeGoal(
+  'Navigate to Settings and enable dark mode',
+  { maxSteps: 10 }
+);
+
+expect(result.success).toBe(true);
+```
+
+#### Visual Regression Testing
+
+```typescript
+import { VisualRegression } from './src';
+
+const regression = new VisualRegression({
+  apiKey: process.env.GEMINI_API_KEY!,
+  baselinesDir: './e2e/baselines',
+  threshold: 95, // 95% similarity required
+});
+
+// Compare screenshot against baseline
+const { passed, diff } = await regression.compare(
+  'login-screen',
+  await device.takeScreenshot('login')
+);
+
+expect(passed).toBe(true);
+```
+
+#### Autonomous App Exploration
+
+```typescript
+import { AppExplorer } from './src';
+
+const explorer = new AppExplorer({
+  apiKey: process.env.GEMINI_API_KEY!,
+  maxSteps: 50,
+  maxScreens: 15,
+});
+
+// Discover screens and find issues
+const result = await explorer.explore();
+
+console.log(`Discovered ${result.screensDiscovered.length} screens`);
+console.log(`Found ${result.issuesFound.length} issues`);
+```
+
+#### Wix Pilot Integration
+
+```typescript
+import { Pilot } from '@wix-pilot/core';
+import { DetoxFrameworkDriver } from '@wix-pilot/detox';
+import { GeminiVisionHandler } from './src';
+
+const visionHandler = new GeminiVisionHandler({
+  apiKey: process.env.GEMINI_API_KEY!,
+  model: 'gemini-3-flash',
+});
+
+const pilot = new Pilot({
+  frameworkDriver: new DetoxFrameworkDriver(),
+  promptHandler: visionHandler, // Use Gemini for decisions
+});
+
+await pilot.perform(
+  'Find the login button and tap it',
+  'Enter test@example.com in the email field',
+  'Verify the home screen is visible'
+);
+```
+
+### Available Gemini Models
+
+| Model | Best For | Speed | Cost |
+|-------|----------|-------|------|
+| `gemini-3-flash` | Most testing (recommended) | Fastest | $0.50/1M tokens |
+| `gemini-2.5-flash` | Complex reasoning with thinking | Fast | $0.15/1M tokens |
+| `gemini-2.5-pro` | Highest accuracy tasks | Slower | $1.25/1M tokens |
+
+### Complete Documentation
+
+See **[references/vision-testing.md](references/vision-testing.md)** for:
+- Detailed API reference for all modules
+- Advanced configuration options
+- Multi-device testing patterns
+- Accessibility auditing
+- Video analysis
+- Integration patterns
 
 ---
 
@@ -475,6 +613,7 @@ The skill includes comprehensive example tests for various app types:
 |----------|-------------|
 | [SKILL.md](SKILL.md) | Full skill reference (Claude Code, Codex, Copilot) |
 | [AGENTS.md](AGENTS.md) | Condensed reference (Cursor, Windsurf, Aider, 20+ tools) |
+| [vision-testing.md](references/vision-testing.md) | **Vision testing with Gemini** — complete API reference |
 | [detox-config.md](references/detox-config.md) | Detox configuration deep-dive |
 | [android-setup.md](references/android-setup.md) | Android native code patches |
 | [pilot-setup.md](references/pilot-setup.md) | AI-powered test generation setup |
@@ -490,26 +629,45 @@ eagle-mobile-e2e-testing/
 ├── AGENTS.md                     # AGENTS.md format (Cursor, Windsurf, Aider, 20+ tools)
 ├── README.md                     # This file
 ├── LICENSE                       # MIT License
+│
+├── src/                          # Vision testing modules (import from here)
+│   ├── index.ts                  # Main exports
+│   ├── handlers/
+│   │   └── GeminiVisionHandler.ts    # Core vision handler (PromptHandler interface)
+│   ├── runners/
+│   │   ├── VisionTestRunner.ts       # Goal-based test execution
+│   │   ├── VideoTestRunner.ts        # Video analysis & comparison
+│   │   └── AppExplorer.ts            # Autonomous app exploration
+│   └── utils/
+│       ├── VisualRegression.ts       # Screenshot baseline comparison
+│       └── VisionReportGenerator.ts  # HTML report generation
+│
 ├── references/
+│   ├── vision-testing.md         # Complete vision testing documentation
 │   ├── detox-config.md           # Complete .detoxrc.js guide
 │   ├── android-setup.md          # Android native patches
 │   ├── pilot-setup.md            # Wix Pilot AI testing
 │   └── ci-workflows.md           # CI/CD configurations
+│
 ├── scripts/
 │   ├── run-e2e.sh                # Automated test runner
 │   ├── generate-report.js        # Standalone HTML report generator
 │   └── report-hub.js             # Consolidated dashboard (multi-session)
-├── examples/                     # 28 comprehensive test examples
-│   ├── login-flow.test.ts        # Authentication patterns
-│   ├── registration-flow.test.ts # User registration
-│   ├── e-commerce.test.ts        # Shopping cart, checkout
-│   ├── social-media.test.ts      # Feed, posts, stories
-│   ├── video-player.test.ts      # Media playback
-│   ├── accessibility.test.ts     # A11y testing patterns
-│   └── ...                       # 22 more examples
+│
+├── examples/                     # Comprehensive test examples
+│   ├── vision-pilot-integration.test.ts  # Vision + Wix Pilot patterns
+│   ├── vision-login.test.ts              # Vision-based login testing
+│   ├── vision-exploration.test.ts        # App exploration examples
+│   ├── vision-video-analysis.test.ts     # Video analysis examples
+│   ├── login-flow.test.ts                # Authentication patterns
+│   ├── e-commerce.test.ts                # Shopping cart, checkout
+│   ├── social-media.test.ts              # Feed, posts, stories
+│   ├── accessibility.test.ts             # A11y testing patterns
+│   └── ...                               # More examples
+│
 └── .github/
     └── workflows/
-        └── e2e-tests.yml.template  # GitHub Actions template (copy to your project)
+        └── e2e-tests.yml.template  # GitHub Actions template
 ```
 
 ---
@@ -559,6 +717,8 @@ git push origin feature/amazing-feature
 | Detox Documentation | [wix.github.io/Detox](https://wix.github.io/Detox/) |
 | Wix Pilot (AI Testing) | [github.com/wix-incubator/pilot](https://github.com/wix-incubator/pilot) |
 | Detox GitHub | [github.com/wix/Detox](https://github.com/wix/Detox) |
+| Google Gemini AI | [ai.google.dev](https://ai.google.dev/) |
+| @google/genai SDK | [npmjs.com/package/@google/genai](https://www.npmjs.com/package/@google/genai) |
 | Agent Skills Specification | [agentskills.io](https://agentskills.io/) |
 | AGENTS.md Standard | [agents.md](https://agents.md/) |
 | Lucide Icons | [lucide.dev](https://lucide.dev/) |
